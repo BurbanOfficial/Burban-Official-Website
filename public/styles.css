@@ -1,0 +1,985 @@
+/* ------------------------------------------------ Page d'accueil site web ------------------------------------------------*/
+/* Reset styles */
+body, h1, p, ul, li, a {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    list-style: none;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Bevellier', sans-serif;
+    line-height: 1.6;
+    color: #000000;
+}
+
+header {
+    position: sticky; /* Fixe le header en haut de l'écran */
+    top: 0; /* Définit la distance par rapport au haut */
+    z-index: 1000; /* Place le header au-dessus des autres éléments */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 10%;
+    background-color: #ffffff; /* Assure que le fond est visible */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ajoute une ombre pour style */
+    color: #000000;
+    border-bottom: 1px solid #ddd; /* Ligne de séparation optionnelle */
+}
+
+main {
+    padding-top: 100px; /* Compensez la hauteur du menu pour éviter qu'il ne cache le contenu */
+}
+
+.logo img {
+    max-height: 50px; /* Ajustez la hauteur selon vos besoins */
+}
+
+nav {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.menu-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.menu {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.menu li {
+    position: relative;
+    margin: 0 15px; /* Espacement entre les éléments du menu */
+}
+
+.menu a {
+    font-size: 1.2rem;
+    color: #000000;
+    padding: 5px 10px;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.menu a:hover {
+    color: #90bed6;
+}
+
+.menu a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0;
+    height: 2px;
+    background: #90bed6;
+    transition: width 0.3s ease;
+}
+
+.menu a:hover::after {
+    width: 100%;
+}
+
+/* Style pour l'élément actif */
+.menu .active a {
+    color: #90bed6; /* Couleur active */
+}
+
+.menu .active a::after {
+    width: 100%; /* Barre soulignée active */
+}
+
+.submenu:hover .dropdown {
+    display: block;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #222;
+    display: none;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.dropdown li a {
+    color: #fff;
+    display: block;
+    padding: 5px 10px;
+    white-space: nowrap;
+    margin: 5px;
+}
+
+.dropdown li a:hover {
+    background: #transparent;
+}
+
+.sign-up a {
+    font-size: 1rem;
+    color: #fff;
+    background: #3ea11f;
+    padding: 10px 20px;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+.sign-up a:hover {
+    background: #e68900;
+}
+
+main {
+    padding: 40px 10%;
+    text-align: center;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #111;
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+/* Cache le menu burger par défaut */
+.burger-menu {
+    display: none;
+}
+
+/* ------------------------------------------------ Responsive Design ------------------------------------------------*/
+/* Cacher le menu principal sur les petits écrans et afficher le menu burger */
+@media (max-width: 768px) {
+    nav {
+        display: none; /* Cache le menu classique */
+    }
+
+    .burger-menu {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .menu-btn {
+        font-size: 1.5rem;
+        cursor: pointer;
+        background: none;
+        border: none;
+        color: white;
+      }
+
+    /* Fond noir avec logo */
+    .menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .menu-overlay .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 2rem;
+        cursor: pointer;
+        background: none;
+        border: none;
+        color: white;
+      }
+
+    .burger-icon {
+        font-size: 30px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+        position: relative;
+    }
+
+    .burger-icon span {
+        display: block;
+        height: 3px;
+        background-color: #000;
+        border-radius: 2px;
+        transition: all 0.3s;
+    }
+
+    .burger-icon i {
+        position: absolute; /* Superpose les icônes */
+        top: 50%; /* Centre verticalement */
+        left: 50%; /* Centre horizontalement */
+        transform: translate(-50%, -50%); /* Ajuste la position au centre */
+        font-size: 30px; /* Taille des icônes */
+        transition: opacity 0.3s ease; /* Transition fluide pour l'apparition/disparition */
+    }
+
+    /* Icône hamburger */
+    .burger-icon .fa-bars {
+        transition: opacity 0.3s ease;
+        display: inline;
+    }
+
+    /* Icône croix */
+    .burger-icon .fa-xmark {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        display: inline;
+        color: #90bed6;
+    }
+
+    /* Lorsque le menu est activé (cliqué), afficher la croix et masquer l'icône du hamburger */
+    .burger-icon.active .fa-bars {
+        opacity: 0;
+        display: inline;
+    }
+
+    .burger-icon.active .fa-xmark {
+        opacity: 1;
+        display: inline;
+    }
+    
+    /* Menu déroulant du menu burger */
+    .burger-dropdown {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        text-align: center;
+        transform: translateY(100%);
+        transition: transform 0.5s ease;
+    }
+
+    .burger-dropdown.active {
+        display: block;
+        bottom: 0%;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .burger-dropdown li {
+        margin: 15px 0;
+        list-style: none;
+    }
+
+    .burger-dropdown li:last-child {
+        border-bottom: none;
+    }
+
+    .burger-dropdown a {
+        display: block;
+        padding: 10px 15px;
+        font-size: 1.2rem;
+        color: #000000;
+        border-radius: 17px;
+        transition: background-color 0.3s ease;
+    }
+
+    .burger-dropdown a:hover {
+        background-color: #d1e7f8;
+    }
+
+    header.hidden {
+        transform: translateY(-100%);
+      }
+}
+
+@media (max-width: 768px) {
+    object {
+      height: 500vh; /* Ajuste la hauteur automatiquement sur les petits écrans */
+    }
+  }
+
+/* --- Online Shop Responsivity ---*/
+.online-shop {
+    width: 100%;
+    height: 162vh;
+    border: none;
+}
+
+@media (max-width: 768px) {
+    .online-shop {
+        height: 1050vh;
+    }
+}
+
+/* Tablettes (paysage) et petits ordinateurs portables (largeur entre 769px et 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .online-shop {
+        height: 960vh;
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1025px) and (max-width: 1850px) {
+    .online-shop {
+        height: 310vh;
+    }
+}
+/* ------------------------------------------------ Header déroulant ------------------------------------------------*/
+/* Container principal */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    height: 44px;
+    overflow: hidden;
+    background-color: transparent;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Contenu défilant */
+  .carousel-content {
+    display: flex;
+    transition: transform 1s linear; /* Défilement fluide */
+    width: auto;
+  }
+
+  /* Style des phrases */
+  .carousel-item {
+    min-width: 100%;
+    text-align: center;
+    font-size: 18px;
+    color: #000;
+    font-family: Arial, sans-serif;
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Satoshi', sans-serif;
+  }
+
+  /* Flèches de navigation */
+  .carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+    border: none;
+    font-size: 15px;
+    color: #060606;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+
+  .carousel-arrow:hover {
+    color: #333;
+  }
+
+  .arrow-left { left: 10px; }
+  .arrow-right { right: 10px; }
+
+/* Masquer les phrases longues sur petits écrans */
+@media (max-width: 768px) {
+    .hide-small {
+      display: none;
+    }
+}
+
+  @media (max-width: 768px) {
+    .carousel-item {
+        font-size: 14px; /* Réduction de la taille de la police */
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-item {
+        font-size: 12px; /* Réduction supplémentaire pour les écrans très petits */
+    }
+}
+
+/* ---------- Adaptation du bouton ---------- */
+/* Style du bouton */
+.cta-button {
+    position: absolute;
+    bottom: -105vh; /* Décale le bouton de 20px depuis le bas */
+    right: 95px; /* Décale le bouton de 20px depuis la droite */
+    padding: 10px 20px;
+    background-color: #683C74; /* Couleur d'arrière-plan du bouton */
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 0px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+/* Effet au survol */
+.cta-button:hover {
+    background-color: #935da1; /* Changer la couleur au survol */
+    border-radius: 5px;
+  }
+
+/* Ajustement pour les écrans plus petits */
+@media screen and (min-width: 481px) and (max-width: 650px) {
+    .cta-button {
+        bottom: 25vh; /* Décale le bouton de 20px depuis le bas */
+        right: 30px; /* Décale le bouton de 20px depuis la droite */
+        font-size: 11px;
+    }
+}
+
+/* Petites tablettes et grands téléphones (portrait, largeur entre 481px et 768px) */
+@media screen and (min-width: 651px) and (max-width: 768px) {
+    .cta-button {
+        bottom: -130vh; /* Décale le bouton de 20px depuis le bas */
+        right: 95px; /* Décale le bouton de 20px depuis la droite */
+    }
+}
+
+/* Tablettes (paysage) et petits ordinateurs portables (largeur entre 769px et 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .cta-button {
+        bottom: -130vh; /* Décale le bouton de 20px depuis le bas */
+        right: 95px; /* Décale le bouton de 20px depuis la droite */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1025px) and (max-width: 1290px) {
+    .cta-button {
+        bottom: -130vh; /* Décale le bouton de 20px depuis le bas */
+        right: 95px; /* Décale le bouton de 20px depuis la droite */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1291px) and (max-width: 1500px) {
+    .cta-button {
+        bottom: -130vh; /* Décale le bouton de 20px depuis le bas */
+        right: 95px; /* Décale le bouton de 20px depuis la droite */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1441px et 1850px) */
+@media screen and (min-width: 1501px) and (max-width: 1850px) {
+    .banner2 {
+        bottom: -130vh; /* Décale le bouton de 20px depuis le bas */
+        right: 95px; /* Décale le bouton de 20px depuis la droite */
+    }
+}
+
+
+/* ------------------------------------------------ Language Selector & Sign Up button------------------------------------------------*/
+/* Header Actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-end; /* Aligner les actions à droite */
+}
+
+.sign-up {
+    font-size: 1rem;
+    color: #fff;
+    background: #90bed6;
+    padding: 10px 20px;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.sign-up:hover {
+    background: #3b6d89;
+}
+
+/* Style du bouton pour changer la langue */
+.language-selector button {
+    background-color: #3ea11f; /* Couleur similaire au bouton Sign Up */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px; /* Bords arrondis */
+    color: white; /* Texte en blanc */
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+}
+
+.language-selector button:hover {
+    background-color: #e68900; /* Couleur de survol */
+}
+
+.language-selector button:focus {
+    outline: none;
+    background-color: #e68900; /* Couleur de survol au focus */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Ombre pour le focus */
+}
+
+.formulaire-connexion-inscription {
+    width: 100%; /* S'adapte à la largeur de son conteneur */
+    height: 180vh; /* 54% de la hauteur de la fenêtre visible */
+    border: none; /* Supprime les bordures */
+}
+
+/* Tablettes (paysage) et petits ordinateurs portables (largeur entre 769px et 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .formulaire-connexion-inscription {
+        width: 100%; /* S'adapte à la largeur de son conteneur */
+        height: 200vh; /* 54% de la hauteur de la fenêtre visible */
+        border: none; /* Supprime les bordures */
+    }
+}
+
+/* Petites tablettes et grands téléphones (portrait, largeur entre 481px et 768px) */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .formulaire-connexion-inscription {
+        width: 100%; /* S'adapte à la largeur de son conteneur */
+        height: 200vh; /* 54% de la hauteur de la fenêtre visible */
+        border: none; /* Supprime les bordures */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1025px) and (max-width: 1850px) {
+    .formulaire-connexion-inscription {
+        width: 100%; /* S'adapte à la largeur de son conteneur */
+        height: 100vh; /* 54% de la hauteur de la fenêtre visible */
+        border: none; /* Supprime les bordures */
+    }
+}
+
+.contactform {
+    width: 100%; /* S'adapte à la largeur de son conteneur */
+    height: 120vh; /* 54% de la hauteur de la fenêtre visible */
+    border: none; /* Supprime les bordures */
+}
+
+/* Tablettes (paysage) et petits ordinateurs portables (largeur entre 769px et 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .contactform {
+        width: 100%; /* S'adapte à la largeur de son conteneur */
+        height: 110vh; /* 54% de la hauteur de la fenêtre visible */
+        border: none; /* Supprime les bordures */
+    }
+}
+
+/* Petites tablettes et grands téléphones (portrait, largeur entre 481px et 768px) */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .contactform {
+        width: 100%; /* S'adapte à la largeur de son conteneur */
+        height: 140vh; /* 54% de la hauteur de la fenêtre visible */
+        border: none; /* Supprime les bordures */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1025px) and (max-width: 1850px) {
+    .contactform {
+        width: 100%; /* S'adapte à la largeur de son conteneur */
+        height: 100vh; /* 54% de la hauteur de la fenêtre visible */
+        border: none; /* Supprime les bordures */
+    }
+}
+
+/* ------------------------------------------------ Galerie Photo ------------------------------------------------*/
+.photo-gallery {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.main-gallery {
+    width: 100%; /* S'adapte à la largeur de son conteneur */
+    height: 56vh; /* 54% de la hauteur de la fenêtre visible */
+    border: none; /* Supprime les bordures */
+}
+
+@media (max-width: 520px) {
+    .main-gallery {
+        height: 160vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 521px) and (max-width: 540px) {
+    .main-gallery {
+        height: 200vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 541px) and (max-width: 600px) {
+    .main-gallery {
+        height: 190vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 601px) and (max-width: 720px) {
+    .main-gallery {
+        height: 205vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 721px) and (max-width: 740px) {
+    .main-gallery {
+        height: 215vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 741px) and (max-width: 760px) {
+    .main-gallery {
+        height: 218vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 761px) and (max-width: 800px) {
+    .main-gallery {
+        height: 90vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 801px) and (max-width: 850px) {
+    .main-gallery {
+        height: 100vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 851px) and (max-width: 910px) {
+    .main-gallery {
+        height: 103vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 911px) and (max-width: 970px) {
+    .main-gallery {
+        height: 110vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 971px) and (max-width: 1024px) {
+    .main-gallery {
+        height: 115vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1025px) and (max-width: 1200px) {
+    .main-gallery {
+        height: 95vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1201px) and (max-width: 1290px) {
+    .main-gallery {
+        height: 50vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1291px) and (max-width: 1340px) {
+    .main-gallery {
+        height: 60vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1341px) and (max-width: 1500px) {
+    .main-gallery {
+        height: 59vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1441px et 1850px) */
+@media screen and (min-width: 1501px) and (max-width: 1600px) {
+    .main-gallery {
+        height: 57vh; /* Hauteur maximale */
+    }
+}
+
+.gallery-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.gallery-item {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-item:hover img {
+    transform: scale(1.1);
+}
+
+.item-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 10px;
+    text-align: left;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gallery-item:hover .item-info {
+    opacity: 1;
+}
+
+.item-info h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.item-info p {
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+}
+
+/* ------------------------------------------------ Section Collections ------------------------------------------------*/
+
+.collections {
+    width: 100%;
+    height: 90vh;
+    border: none;
+}
+
+@media (max-width: 768px) {
+    .collections {
+        height: 110vh;
+    }
+}
+
+/* Tablettes (paysage) et petits ordinateurs portables (largeur entre 769px et 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .collections {
+        height: 110vh;
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1025px) and (max-width: 1850px) {
+    .collections {
+        height: 90vh;
+    }
+}
+
+/* ------------------------------------------------ Section Bannières ------------------------------------------------*/
+
+.main-banners {
+    width: 100%; /* S'adapte à la largeur de son conteneur */
+    height: 215vh; /* 54% de la hauteur de la fenêtre visible */
+    border: none; /* Supprime les bordures */
+}
+
+/* Ajustement pour les écrans plus petits */
+
+@media (max-width: 520px) {
+    .main-banners {
+        height: 58vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 521px) and (max-width: 540px) {
+    .main-banners {
+        height: 60vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 541px) and (max-width: 600px) {
+    .main-banners {
+        height: 70vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 601px) and (max-width: 720px) {
+    .main-banners {
+        height: 80vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 721px) and (max-width: 740px) {
+    .main-banners {
+        height: 82vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 741px) and (max-width: 760px) {
+    .main-banners {
+        height: 85vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 761px) and (max-width: 800px) {
+    .main-banners {
+        height: 90vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 801px) and (max-width: 850px) {
+    .main-banners {
+        height: 95vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 851px) and (max-width: 910px) {
+    .main-banners {
+        height: 103vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 911px) and (max-width: 970px) {
+    .main-banners {
+        height: 110vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+@media screen and (min-width: 971px) and (max-width: 1024px) {
+    .main-banners {
+        height: 115vh; /* 54% de la hauteur de la fenêtre visible */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1025px) and (max-width: 1200px) {
+    .main-banners {
+        height: 135vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1201px) and (max-width: 1290px) {
+    .main-banners {
+        height: 145vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1291px) and (max-width: 1340px) {
+    .main-banners {
+        height: 150vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1025px et 1440px) */
+@media screen and (min-width: 1341px) and (max-width: 1500px) {
+    .main-banners {
+        height: 165vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1441px et 1850px) */
+@media screen and (min-width: 1501px) and (max-width: 1600px) {
+    .main-banners {
+        height: 185vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1441px et 1850px) */
+@media screen and (min-width: 1601px) and (max-width: 1700px) {
+    .main-banners {
+        height: 190vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1441px et 1850px) */
+@media screen and (min-width: 1701px) and (max-width: 1780px) {
+    .main-banners {
+        height: 198vh; /* Hauteur maximale */
+    }
+}
+
+/* Ordinateurs standards (largeur entre 1441px et 1850px) */
+@media screen and (min-width: 1781px) and (max-width: 1850px) {
+    .main-banners {
+        height: 205vh; /* Hauteur maximale */
+    }
+}
+  
+  /* Style du panneau panier */
+  .cart {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    /* Vous pouvez ajuster la hauteur selon vos besoins (exemple : max-height: 90%;) */
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0);
+    padding: 20px;
+    z-index: 10000;
+    overflow-y: auto;
+  }
+  .cart-header {
+    font-size: 24px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .remove-item {
+    color: red;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  .total-price {
+    font-size: 18px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .checkout-button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+  }
