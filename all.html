@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Shop | EN</title>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://i.imgur.com/CCC34mn.png">
+    <!-- Favicon pour les navigateurs modernes -->
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" sizes="16x16" />
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" sizes="32x32" />
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" sizes="48x48" />
+    <style>
+        /* Styles généraux */
+        body {
+            font-family: 'Satoshi', sans-serif;
+            background-color: #transparent;
+            margin: 0;
+            padding: 0;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .cart-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .cart-icon img {
+            width: 40px;
+        }
+
+        .shop-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 30px;
+            gap: 20px;
+        }
+
+        .product-card {
+            position: relative;
+            background-color: white;
+            border-radius: 10px;
+            width: 250px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-card2 {
+            width: 30px;
+            position: relative;
+            height: 30px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-right: 0px;
+            transition: transform 0.2s;
+        }
+
+        .product-card2:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .product-info {
+            margin-top: 15px;
+        }
+
+        .product-title {
+            font-size: 19px;
+            color: #333;
+        }
+
+        .product-title2 {
+            font-size: 15px;
+            transform: translateY(-18px);
+            color: #333;
+        }
+
+        .product-price {
+            font-size: 16px;
+            color: #888;
+            margin: 10px 0;
+        }
+
+        .product-categorie {
+            font-size: 14px;
+            color: #888;
+            margin-top: -5px;
+            margin-bottom: 1px;
+        }
+
+        .view-product-button {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            margin-top: auto;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .view-product-button:hover {
+            background-color: #424242;
+            transform: scale(1.05);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .mosaic img {
+            width: 100px;
+            height: 100px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        /* Effet de zoom sur l'image agrandie */
+        .zoomed-img {
+            width: 90%;
+            height: auto;
+            border-radius: 15px;
+        }
+
+        .add-to-cart-button {
+            background-color: #000000;
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            transition: 0.2s;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            margin-left: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .add-to-cart-button:hover {
+            color: #000000;
+            background: #fff;
+            transform: scale(1.05);
+        }
+
+        /* Lignes animées autour du bouton */
+        .add-to-cart-button::before, .add-to-cart-button::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #000000;
+            transition: transform 0.3s;
+        }
+
+        /* Ligne supérieure */
+        .add-to-cart-button::before {
+            top: 0;
+            left: 0;
+            transform: scaleX(0);
+        }
+
+        /* Ligne inférieure */
+        .add-to-cart-button::after {
+            bottom: 0;
+            right: 0;
+            transform: scaleX(0);
+        }
+
+         /* Animation des lignes au survol */
+        .add-to-cart-button:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* Effet d'onde au clic */
+        .add-to-cart-button span {
+            position: absolute;
+            display: block;
+            border-radius: 50%;
+            transform: scale(0);
+            background: rgba(255, 255, 255, 0.5);
+            animation: ripple 0.6s linear;
+        }
+
+        /* Animation de l'onde */
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Insertion de l'onde lors du clic */
+        .add-to-cart-button:active span {
+            animation: ripple 0.6s;
+        }
+
+        .add-to-cart-button:hover::after {
+            transform: scaleX(1);
+        }
+
+        .color-selection {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .color-container {
+            display: flex;
+            justify-content: center; /* Centre les cercles de couleur */
+            margin-bottom: 10px; /* Espacement entre les cercles et le prix */
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            border: 1px solid #000000;
+            margin-bottom: 10px;
+            margin-right: 0px;
+            transition: transform 0.2s;
+        }
+
+        .color-option.selected {
+            background-color: #000000;
+            color: white;
+        }
+
+        .color-option:hover {
+            background-color: #424242;
+            color: white;
+        }
+
+        .color-circles {
+            display: flex; /* Affiche les cercles côte à côte */
+            justify-content: center; /* Centre les cercles horizontalement */
+            margin: 8px 0; /* Marge autour des cercles */
+        }
+
+        .color-circle {
+            width: 15px;
+            height: 15px;
+            border-radius: 5px;
+            margin: 0 3px; /* Espace entre les cercles */
+            border: 1px solid #000000;
+            cursor: pointer; /* Pointeur de souris au survol */
+        }
+        
+        .color-circle:hover {
+            transform: scale(1.1); /* Agrandit légèrement le cercle au survol */
+        }
+
+        .color-name {
+            position: absolute; /* Positionner l'infobulle */
+            background: rgba(0, 0, 0, 0.7); /* Fond semi-transparent */
+            color: rgb(0, 0, 0); /* Couleur du texte */
+            padding: 5px; /* Espacement interne */
+            border-radius: 5px; /* Coins arrondis */
+            z-index: 10; /* Mettre au-dessus des autres éléments */
+        }
+
+        .size-selection {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .size-option {
+            padding: 10px;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .size-option.selected {
+            background-color: #000000;
+            color: white;
+        }
+
+        .size-option:hover {
+            background-color: #424242;
+            color: white;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .size-option.out-of-stock {
+            color: #888;
+            text-decoration: line-through;
+            cursor: not-allowed;
+        }
+
+        .similar-articles {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .similar-articles-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .filter-menu-container {
+            position: relative;
+        }
+
+        .filter-menu-toggle {
+            position: fixed;
+            top: 30px;
+            left: 20px;
+            z-index: 10;
+            padding: 0px -0px;
+            background-color: #3062be;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .filter-menu-toggle-image {
+            width: 50%;
+            margin-top: 6px;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .filter-menu-toggle:hover {
+            position: fixed;
+            top: 30px;
+            left: 20px;
+            z-index: 10;
+            padding: 0px -0px;
+            background-color: #3062beb6;
+            color: #000000;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Panneau de filtres */
+        .filter-panel {
+            position: fixed;
+            top: 0;
+            left: -300px; /* Initialement masqué hors écran */
+            width: 300px;
+            height: 100%;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0 5px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            overflow-y: auto;
+            z-index: 9;
+        }
+
+        .filter-panel h4,
+        .filter-panel h5 {
+            margin-top: 0;
+        }
+
+        .filter-panel label {
+            display: block;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        /* Panneau visible */
+        .filter-panel.active {
+            left: 0;
+        }
+
+        .product-grid {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .product-card {
+            width: 200px;
+            margin: 10px;
+            display: block;
+        }
+
+        button {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .buttonfilters {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            margin-left: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #000000b6;
+            transform: scale(1.05);
+        }
+
+        /*Option qui permet de masquer certains produits dans la page où tout les produits sont visibles*/
+        .hidden-product {
+            display: none;
+        }
+
+        #filter-toggle-button {
+            background-color: #000000;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #filter-toggle-button:hover {
+            background-color: #000000b6;
+        }
+
+        /* Étiquette environnementale */
+        .eco-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #eaf7ea;
+            color: #2f9e44;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10; /* Toujours au-dessus des images */
+        }
+
+        /* Icône dans l'étiquette */
+        .eco-icon {
+            margin-right: 5px;
+            font-size: 14px;
+        }
+
+        /* Bulle d'information (cachée par défaut) */
+        .eco-tooltip {
+            position: absolute;
+            top: 35px; /* Ajusté pour apparaître sous l'étiquette */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            color: #333;
+            font-size: 12px;
+            padding: 8px 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            z-index: 20; /* Toujours au-dessus des autres éléments */
+        }
+
+        /* Affiche la bulle au survol */
+        .eco-label:hover .eco-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Empêche le défilement de la page sous la modale */
+        body.modal-open {
+            overflow: hidden; /* Désactive le défilement de la page principale */
+        }
+
+        @media only screen and (max-width: 767px) {
+            /*CSS rules for mobile devices */
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 991px) {
+            /*CSS rules for tablets */
+        }
+
+        @media only screen and (min-width: 992px) and (max-width: 1199px) {
+            /*CSS rules for laptops */
+        }
+
+        @media only screen and (min-width: 1200px) {
+            /*CSS rules for desktops */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="filter-menu-container">
+        <button class="filter-menu-toggle" onclick="toggleFilterMenu()" id="filter-toggle-button">Filters</button>
+        <div class="filter-panel" id="filter-panel">
+        <h4>Filters</h4>
+    
+        <!-- Filtre par catégorie -->
+        <div class="filter-category">
+            <br><br><h5>Categories</h5>
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="sweat" onchange="filterProducts()">
+                Hoodies
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="t-shirt" onchange="filterProducts()">
+                T-Shirts
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="bonnet" onchange="filterProducts()">
+                Beanies
+            </label>
+        </div>
+
+        <!-- Filtre par couleur -->
+        <div class="filter-color">
+            <br><h5>Colors</h5>
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="blanc" onchange="filterProducts()">
+                White
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="noir" onchange="filterProducts()">
+                Black
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="violet" onchange="filterProducts()">
+                Purple
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="orange" onchange="filterProducts()">
+                Orange
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="bleu" onchange="filterProducts()">
+                Blue
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="bleuciel" onchange="filterProducts()">
+                Sky Blue
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="beige" onchange="filterProducts()">
+                Beige
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="vert" onchange="filterProducts()">
+                Green
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="vertfoncé" onchange="filterProducts()">
+                Dark Green
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="rouge" onchange="filterProducts()">
+                Red
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="bordeaux" onchange="filterProducts()">
+                Maroon
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="gris" onchange="filterProducts()">
+                Gray
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="anthracite" onchange="filterProducts()">
+                Anthracite
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="lavande" onchange="filterProducts()">
+                Lavender
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="rose" onchange="filterProducts()">
+                Pink
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="pêche" onchange="filterProducts()">
+                Peach
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="jaune" onchange="filterProducts()">
+                Yellow
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="argent" onchange="filterProducts()">
+                Silver
+            </label>
+
+            <label>
+                <input type="checkbox" class="filter-checkbox" value="naturel" onchange="filterProducts()">
+                Natural
+            </label>
+        </div>
+
+        <!-- Filtre par prix avec barre dynamique -->
+        <div class="filter-price">
+            <br><h5>Price (max.)</h5>
+            <input type="range" id="price-range" min="25" max="100" value="100" oninput="updatePriceDisplay(this.value)" onchange="filterProducts()">
+            <span id="price-value">100€</span>
+        </div>
+
+        <!-- Bouton pour réinitialiser les filtres -->
+        <button class="buttonfilters" onclick="resetFilters()">Reset</button>
+    </div>
+        
+<!-- Affichage de tous les articles dans la page de découverte des articles dans la boutique -->
+<div class="shop-container">
+    <div class="shop-container">
+        <div class="product-card" data-category="sweat" data-color="blanc rouge noir" data-price="60.99" onmouseover="showImage(this, 'https://i.imgur.com/kpPhZHp.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/r9HQUCq.jpeg')" onclick="openProductPageProduct18()">
+            <!-- Étiquette respectueuse de l'environnement -->
+        <div class="eco-label">
+            <span class="eco-icon">🌱</span>
+        <!-- Bulle d'information (cachée par défaut) -->
+        <div class="eco-tooltip">
+            This product is environmentally friendly.
+        </div>
+        </div>
+            <img src="https://i.imgur.com/r9HQUCq.jpeg" alt="Produit 18" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">Universal Love</h3>
+                <h6 class="product-categorie">Hoodie</h6>
+                <!-- Cercle de couleur personnalisé -->
+                <p class="product-price">60,99€</p>
+                <button class="view-product-button" onclick="openProductPageProduct18(); event.stopPropagation();">Discover</button>
+            </div>
+        </div>
+
+        <div class="product-card" data-category="sweat" data-color="blanc vert jaune noir" data-price="63.99" onmouseover="showImage(this, 'https://i.imgur.com/aMYJCU0.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/EcjqfHS.jpeg')" onclick="openProductPageProduct17()">
+            <!-- Étiquette respectueuse de l'environnement -->
+        <div class="eco-label">
+            <span class="eco-icon">🌱</span>
+        <!-- Bulle d'information (cachée par défaut) -->
+        <div class="eco-tooltip">
+            This product is environmentally friendly.
+        </div>
+        </div>
+            <img src="https://i.imgur.com/EcjqfHS.jpeg" alt="Produit 17" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">Natural Glow</h3>
+                <h6 class="product-categorie">Hoodie</h6>
+                <!-- Cercle de couleur personnalisé -->
+                <p class="product-price">63,99€</p>
+                <button class="view-product-button" onclick="openProductPageProduct17(); event.stopPropagation();">Discover</button>
+            </div>
+        </div>
+
+        <div class="product-card" data-category="sweat" data-color="blanc bleuciel bleu noir rouge" data-price="83.5" onmouseover="showImage(this, 'https://i.imgur.com/QGIzJw8.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/aTSbQft.jpeg')" onclick="openProductPageProduct16BleuFoncé()">
+            <!-- Étiquette respectueuse de l'environnement -->
+        <div class="eco-label">
+            <span class="eco-icon">🌱</span>
+        <!-- Bulle d'information (cachée par défaut) -->
+        <div class="eco-tooltip">
+            This product is environmentally friendly.
+        </div>
+        </div>
+            <img src="https://i.imgur.com/aTSbQft.jpeg" alt="Produit 16" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">Mad In Love</h3>
+                <h6 class="product-categorie">Hoodie</h6>
+                <!-- Cercle de couleur personnalisé -->
+                <div class="color-circles">
+                    <div class="color-circle" style="background-color: #0b0b0b;"></div>
+                    <div class="color-circle" style="background-color: #132e57;"></div>
+                </div>
+                <p class="product-price">83,50€</p>
+                <button class="view-product-button" onclick="openProductPageProduct16BleuFoncé(); event.stopPropagation();">Discover</button>
+            </div>
+        </div>
+
+        <div class="product-card" data-category="t-shirt" data-color="blanc vert violet rose" data-price="33.99" onmouseover="showImage(this, 'https://i.imgur.com/7sIbmpM.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/3EAiQad.jpeg')" onclick="openProductPageProduct15()">
+            <!-- Étiquette respectueuse de l'environnement -->
+        <div class="eco-label">
+            <span class="eco-icon">🌱</span>
+        <!-- Bulle d'information (cachée par défaut) -->
+        <div class="eco-tooltip">
+            This product is environmentally friendly.
+        </div>
+        </div>
+            <img src="https://i.imgur.com/3EAiQad.jpeg" alt="Produit 15" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">Morning Sweets</h3>
+                <h6 class="product-categorie">T-Shirt</h6>
+                <p class="product-price">33,99€</p>
+                <button class="view-product-button" onclick="openProductPageProduct15(); event.stopPropagation();">Discover</button>
+            </div>
+        </div>
+
+        <div class="product-card" data-category="t-shirt" data-color="blanc bleuciel rose argent jaune naturel" data-price="25" onmouseover="showImage(this, 'https://i.imgur.com/JUTOhrC.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/ixxq2Oy.jpeg')" onclick="openProductPageProduct14BabyBlue()">
+            <!-- Étiquette respectueuse de l'environnement -->
+            <div class="eco-label">
+                <span class="eco-icon">🌱</span>
+            <!-- Bulle d'information (cachée par défaut) -->
+            <div class="eco-tooltip">
+                This product is environmentally friendly.
+            </div>
+            </div>
+            <img src="https://i.imgur.com/ixxq2Oy.jpeg" alt="produit14 - Baby Blue" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">Skate</h3>
+                <h6 class="product-categorie">T-Shirt - Light Colors</h6>
+                <!-- Cercle de couleur personnalisé -->
+                <div class="color-circles">
+                    <div class="color-circle" style="background-color: #c7d7ef;"></div>
+                    <div class="color-circle" style="background-color: #ffd8e1;"></div>
+                    <div class="color-circle" style="background-color: #e3e3dd;"></div>
+                    <div class="color-circle" style="background-color: #fef1d1;"></div>
+                    <div class="color-circle" style="background-color: #f7fee5;"></div>
+                    <div class="color-circle" style="background-color: #fff;"></div>
+                </div>
+                <p class="product-price">25,00€</p>
+                <button class="view-product-button" onclick="openProductPageProduct14BabyBlue(); event.stopPropagation();">Discover</button>
+            </div>
+        </div>
+
+        <div class="product-card" data-category="t-shirt" data-color="noir bleu violet vertfoncé bordeaux" data-price="25" onmouseover="showImage(this, 'https://i.imgur.com/MfMDyHm.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/raX8jWO.jpeg')" onclick="openProductPageProduct13Forest()">
+            <!-- Étiquette respectueuse de l'environnement -->
+            <div class="eco-label">
+                <span class="eco-icon">🌱</span>
+            <!-- Bulle d'information (cachée par défaut) -->
+            <div class="eco-tooltip">
+                This product is environmentally friendly.
+            </div>
+            </div>
+            <img src="https://i.imgur.com/raX8jWO.jpeg" alt="produit13 - Forest" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">Skate</h3>
+                <h6 class="product-categorie">T-Shirt - Dark Colors</h6>
+                <!-- Cercle de couleur personnalisé -->
+                <div class="color-circles">
+                    <div class="color-circle" style="background-color: #0c0c0c;"></div>
+                    <div class="color-circle" style="background-color: #2c1013;"></div>
+                    <div class="color-circle" style="background-color: #230f46;"></div>
+                    <div class="color-circle" style="background-color: #721d37;"></div>
+                    <div class="color-circle" style="background-color: #223e25;"></div>
+                    <div class="color-circle" style="background-color: #536ba7;"></div>
+                </div>
+                <p class="product-price">25,00€</p>
+                <button class="view-product-button" onclick="openProductPageProduct13Forest(); event.stopPropagation();">Discover</button>
+            </div>
+        </div>
+
+    <div class="product-card" data-category="bonnet" data-color="blanc bleu" data-price="34" onmouseover="showImage(this, 'https://i.imgur.com/lArV95v.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/QIM5Xl4.jpeg')" onclick="openProductPageProduct11()">
+        <img src="https://i.imgur.com/QIM5Xl4.jpeg" alt="Produit 11" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">Starry</h3>
+            <h6 class="product-categorie">Beanie</h6>
+            <p class="product-price">34,00€</p>
+            <button class="view-product-button" onclick="openProductPageProduct11(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+
+    <div class="product-card" data-category="sweat" data-color="blanc vert jaune noir rouge bleu" data-price="59.99" onmouseover="showImage(this, 'https://i.imgur.com/oiYdEJ1.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/3A3fP9Z.jpeg')" onclick="openProductPageProduct12()">
+        <img src="https://i.imgur.com/3A3fP9Z.jpeg" alt="Produit 12" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">Cartoon</h3>
+            <h6 class="product-categorie">Hoodie</h6>
+            <p class="product-price">59,99€</p>
+            <button class="view-product-button" onclick="openProductPageProduct12(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+
+    <div class="product-card" data-category="bonnet" data-color="blanc" data-price="34.80" onmouseover="showImage(this, 'https://i.imgur.com/3Tf7X89.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/h6QYpXG.jpeg')" onclick="openProductPageProduct10()">
+        <img src="https://i.imgur.com/h6QYpXG.jpeg" alt="Produit 10" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">White Shine</h3>
+            <h6 class="product-categorie">Beanie</h6>
+            <p class="product-price">34,80€</p>
+            <button class="view-product-button" onclick="openProductPageProduct10(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+
+    <div class="product-card" data-category="sweat" data-color="blanc rose jaune bleuciel noir" data-price="64.99" onmouseover="showImage(this, 'https://i.imgur.com/3S37h31.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/wyMnPJT.jpeg')" onclick="openProductPageProduct9()">
+        <img src="https://i.imgur.com/wyMnPJT.jpeg" alt="Produit 9" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">Stay Cool</h3>
+            <h6 class="product-categorie">Hoodie</h6>
+            <p class="product-price">64,99€</p>
+            <button class="view-product-button" onclick="openProductPageProduct9(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+
+    <div class="product-card" data-category="bonnet" data-color="blanc noir" data-price="34.99" onmouseover="showImage(this, 'https://i.imgur.com/JmKvvP8.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/HEiFUHq.jpeg')" onclick="openProductPageProduct8Black()">
+        <img src="https://i.imgur.com/HEiFUHq.jpeg" alt="Produit 8" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">Elegance</h3>
+            <h6 class="product-categorie">Beanie</h6>
+            <!-- Cercle de couleur personnalisé -->
+            <div class="color-circles">
+                <div class="color-circle" style="background-color: #fff;"></div>
+                <div class="color-circle" style="background-color: #000;"></div>
+            </div>
+            <p class="product-price">34,99€</p>
+            <button class="view-product-button" onclick="openProductPageProduct8Black(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+
+    <div class="product-card" data-category="sweat" data-color="noir vert" data-price="62.99" onmouseover="showImage(this, 'https://i.imgur.com/LV91a36.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/5Ya85o8.jpeg')" onclick="openProductPageProduct2()">
+        <img src="https://i.imgur.com/5Ya85o8.jpeg" alt="Produit 2" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">Emerald</h3>
+            <h6 class="product-categorie">Hoodie</h6>
+            <p class="product-price">62,99€</p>
+            <button class="view-product-button" onclick="openProductPageProduct2(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+
+    <div class="product-card" data-category="sweat" data-color="blanc violet orange" data-price="69.99" onmouseover="showImage(this, 'https://i.imgur.com/lSjlJ0W.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/70YG2tk.jpeg')" onclick="openProductPageProduct3()">
+        <img src="https://i.imgur.com/70YG2tk.jpeg" alt="Produit 3" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">Lavender Glow</h3>
+            <h6 class="product-categorie">Hoodie</h6>
+            <p class="product-price">69,99€</p>
+            <button class="view-product-button" onclick="openProductPageProduct3(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+
+    <div class="product-card" data-category="sweat" data-color="blanc vert rouge" data-price="69.99" onmouseover="showImage(this, 'https://i.imgur.com/9XU1KQK.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/4u6mGvR.jpeg')" onclick="openProductPageProduct4()">
+        <img src="https://i.imgur.com/4u6mGvR.jpeg" alt="Produit 4" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">Harmony</h3>
+            <h6 class="product-categorie">Hoodie</h6>
+            <p class="product-price">69,99€</p>
+            <button class="view-product-button" onclick="openProductPageProduct4(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+
+    <div class="product-card" data-category="sweat" data-color="bleuciel beige blanc noir" data-price="59.99" onmouseover="showImage(this, 'https://i.imgur.com/obiOyc5.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/AX4e0vt.jpeg')" onclick="openProductPageProduct6Noir()">
+        <img src="https://i.imgur.com/AX4e0vt.jpeg" alt="produit6 - Noir" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">Bunny Chic</h3>
+            <h6 class="product-categorie">Hoodie</h6>
+            <!-- Cercle de couleur personnalisé -->
+            <div class="color-circles">
+                <div class="color-circle" style="background-color: #d6edf7;"></div>
+                <div class="color-circle" style="background-color: #f5e8ce;"></div>
+                <div class="color-circle" style="background-color: #080808;"></div>
+                <div class="color-circle" style="background-color: #fff;"></div>
+            </div>
+            <p class="product-price">59,99€</p>
+            <button class="view-product-button" onclick="openProductPageProduct6Noir(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+
+    <div class="product-card" data-category="t-shirt" data-color="bleu rouge gris lavande rose anthracite blanc" data-price="32.99" onmouseover="showImage(this, 'https://i.imgur.com/Cvvh05l.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/XmaTHYL.jpeg')" onclick="openProductPageProduct5CottonPink()">
+        <!-- Étiquette respectueuse de l'environnement -->
+        <div class="eco-label">
+            <span class="eco-icon">🌱</span>
+        <!-- Bulle d'information (cachée par défaut) -->
+        <div class="eco-tooltip">
+            This product is environmentally friendly.
+        </div>
+        </div>
+        <img src="https://i.imgur.com/XmaTHYL.jpeg" alt="produit5 - Cotton Pink" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">Urban Vibes</h3>
+            <h6 class="product-categorie">T-Shirt</h6>
+            <!-- Cercle de couleur personnalisé -->
+            <div class="color-circles">
+                <div class="color-circle" style="background-color: #112537;"></div>
+                <div class="color-circle" style="background-color: #801f24;"></div>
+                <div class="color-circle" style="background-color: #3e383e;"></div>
+                <div class="color-circle" style="background-color: #7a8ca8;"></div>
+                <div class="color-circle" style="background-color: #cfcbc8;"></div>
+                <div class="color-circle" style="background-color: #ffe9eb;"></div>
+                <div class="color-circle" style="background-color: #f7ecff;"></div>
+                <div class="color-circle" style="background-color: #fff;"></div>
+            </div>
+            <p class="product-price">32,99€</p>
+            <button class="view-product-button" onclick="openProductPageProduct5CottonPink(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+
+    <div class="product-card" data-category="t-shirt" data-color="lavande rose blanc pêche" data-price="32.99" onmouseover="showImage(this, 'https://i.imgur.com/ue0Yr4m.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/16SdjUd.jpeg')" onclick="openProductPageProduct7Lavender()">
+        <!-- Étiquette respectueuse de l'environnement -->
+        <div class="eco-label">
+            <span class="eco-icon">🌱</span>
+        <!-- Bulle d'information (cachée par défaut) -->
+        <div class="eco-tooltip">
+            This product is environmentally friendly.
+        </div>
+        </div>
+        <img src="https://i.imgur.com/16SdjUd.jpeg" alt="produit7 - Lavender" class="product-image">
+        <div class="product-info">
+            <h3 class="product-title">Bold & Free</h3>
+            <h6 class="product-categorie">T-Shirt</h6>
+            <!-- Cercle de couleur personnalisé -->
+            <div class="color-circles">
+                <div class="color-circle" style="background-color: #ffd2be;"></div>
+                <div class="color-circle" style="background-color: #ffe9eb;"></div>
+                <div class="color-circle" style="background-color: #f7ecff;"></div>
+                <div class="color-circle" style="background-color: #fff;"></div>
+            </div>
+            <p class="product-price">32,99€</p>
+            <button class="view-product-button" onclick="openProductPageProduct7Lavender(); event.stopPropagation();">Discover</button>
+        </div>
+    </div>
+</div>
+
+<!-- Fenêtre modale des différents articles -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<!-- Fenêtre modale pour l'affichage des images agrandies -->
+<div id="imageModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeImageModal()">&times;</span>
+        <img id="zoomedImage" class="zoomed-img" src="" alt="Zoomed Image">
+    </div>
+</div>
+
+<script>
+    function showImage(card, imageUrl) {
+        const img = card.querySelector('.product-image');
+        img.src = imageUrl;
+    }
+
+    function openModal(productId) {
+        const modal = document.getElementById("modal");
+        const modalBody = document.getElementById("modal-body");
+        document.querySelector('.modal').style.display = 'block';
+        document.body.classList.add('modal-open');  // Ajoute la classe pour bloquer le défilement de la page
+
+    // Sauvegarde de la position actuelle du défilement
+    scrollPosition = window.scrollY;
+
+    // Affichage de la modale
+    modal.style.display = "block";
+
+    // Faire défiler la page vers le haut
+    window.scrollTo(0, 0);
+        
+            modal.style.display = "block";
+    }
+
+    function closeModal() {
+        const modal = document.getElementById("modal");
+        modal.style.display = "none";
+        document.querySelector('.modal').style.display = 'none';
+        document.body.classList.remove('modal-open');  // Retire la classe pour permettre à la page de défiler à nouveau
+
+    // Revenir à la position de défilement d'origine
+    window.scrollTo(0, scrollPosition);
+
+    }
+
+    function openGalleryModal(imageSrc) {
+        const modalBody = document.getElementById("modal-body");
+        modalBody.innerHTML = `<img src="${imageSrc}" alt="Image agrandie" class="zoomed-img">`;
+    }
+
+    // Fonction pour gérer l'agrandissement de l'image dans une modale séparée
+    function openGalleryModal(src) {
+        const imageModal = document.getElementById("imageModal");
+        const zoomedImage = document.getElementById("zoomedImage");
+        zoomedImage.src = src;
+        imageModal.style.display = "block";
+    }
+
+    function closeImageModal() {
+        const imageModal = document.getElementById("imageModal");
+        imageModal.style.display = "none";
+    }
+
+    let selectedSize = "";
+
+    function selectSize(element) {
+        const sizeOptions = document.querySelectorAll('.size-option');
+        sizeOptions.forEach(option => option.classList.remove('selected'));
+        element.classList.add('selected');
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        addToCartBtn.style.display = 'inline-block';
+        addToCartBtn.setAttribute('data-link', element.getAttribute('data-link'));
+    }
+
+    function addToCart() {
+        const selectedSize = document.querySelector('.size-option.selected');
+        if (selectedSize) {
+            const paymentLink = selectedSize.getAttribute('data-link');
+            window.open(paymentLink, '_blank');
+        } else {
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+    }
+
+    // Fonction pour les tailles indisponibles
+    function indisponible() {
+        alert("This product is currently unavailable.");
+    }
+
+    // Fonction pour mettre à jour l'affichage de la barre de prix en temps réel
+    function updatePriceDisplay(value) {
+        document.getElementById("price-value").innerText = value + "€";
+    }
+
+    // Fonction pour filtrer les produits en fonction des filtres sélectionnés
+    function filterProducts() {
+    const selectedCategories = Array.from(document.querySelectorAll(".filter-category input:checked")).map(checkbox => checkbox.value);
+    const selectedColors = Array.from(document.querySelectorAll(".filter-color input:checked")).map(checkbox => checkbox.value);
+    const maxPrice = parseFloat(document.getElementById("price-range").value);
+
+    const products = document.querySelectorAll(".product-card");
+    let visibleCount = 0;
+
+    products.forEach(product => {
+        const category = product.getAttribute("data-category");
+        const colors = product.getAttribute("data-color").split(" "); // Divise les couleurs en liste
+        const price = parseFloat(product.getAttribute("data-price"));
+
+        // Vérifie si le produit correspond aux filtres de catégorie
+        const matchCategory = selectedCategories.length === 0 || selectedCategories.includes(category);
+
+        // Vérifie si le produit correspond à au moins une des couleurs sélectionnées
+        const matchColor = selectedColors.length === 0 || selectedColors.some(color => colors.includes(color));
+
+        // Vérifie si le produit est dans la limite de prix
+        const matchPrice = price <= maxPrice;
+
+        // Affiche le produit seulement s'il correspond à tous les filtres
+        if (matchCategory && matchColor && matchPrice) {
+            product.style.display = "block";
+            visibleCount++;
+        } else {
+            product.style.display = "none";
+        }
+    });
+
+    // Message d'alerte si aucun produit n'est visible
+    if (visibleCount === 0) {
+        alert("Aucun produit ne correspond aux filtres sélectionnés.");
+    }
+}
+
+    // Fonction pour réinitialiser tous les filtres
+    function resetFilters() {
+        // Réinitialise les cases à cocher
+        document.querySelectorAll(".filter-checkbox").forEach(checkbox => checkbox.checked = false);
+
+        // Réinitialise la barre de prix à sa valeur maximale
+        const priceRange = document.getElementById("price-range");
+        priceRange.value = priceRange.max;
+        updatePriceDisplay(priceRange.value);
+
+        // Relance le filtrage pour afficher tous les produits
+        filterProducts();
+    }
+
+    function createRipple(event) {
+    const button = event.currentTarget;
+    const circle = document.createElement("span");
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+    circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+
+    button.appendChild(circle);
+
+    setTimeout(() => circle.remove(), 600);
+  }
+
+  function toggleFilterMenu() {
+    const filterPanel = document.querySelector('.filter-panel');
+    filterPanel.classList.toggle('active');
+}
+
+function updatePriceDisplay(value) {
+    document.getElementById("price-value").innerText = value + '€';
+}
+
+function toggleFilterMenu() {
+    const filterToggleButton = document.getElementById("filter-toggle-button");
+    const filterPanel = document.getElementById("filter-panel");
+
+    // Basculer entre ouvert et fermé
+    if (filterPanel.classList.contains("active")) {
+        filterPanel.classList.remove("active");
+        filterToggleButton.textContent = "Filters"; // Texte lorsque fermé
+    } else {
+        filterPanel.classList.add("active");
+        filterToggleButton.textContent = "Close Filters"; // Texte lorsque ouvert
+    }
+}
+
+    function openSizeGuideProduit1() {
+        window.open('https://drive.google.com/file/d/1ASewdOGzIbSo6-WVxrrR6-RKkoqxb4L-/view?usp=sharing', '_blank');
+    }
+
+    function openSizeGuideProduit2() {
+        window.open('https://drive.google.com/file/d/1rRCmdNWZyFbp311Yg43dBe3_iHsCDmwl/view?usp=sharing', '_blank');
+    }
+
+    function openSizeGuideProduit3() {
+        window.open('https://f1151672-10ea-4ccb-a39b-d728ac0d70ec.filesusr.com/ugd/703728_a6053be8b0e04c84bfd3c39cf3e2d17e.pdf', '_blank');
+    }
+
+    function openSizeGuideProduit5() {
+        window.open('https://drive.google.com/file/d/1a9aX411v5tZ5yjnYtZet3c4e44Mr9Uwd/view?usp=sharing', '_blank');
+    }
+
+    function openSizeGuideProduit6() {
+        window.open('https://drive.google.com/file/d/1Q6TtYJMhPrSLlrLe0w6-InbCdSuntDbR/view?usp=sharing', '_blank');
+    }
+</script>
+
+<script>
+function openProductPageProduct15() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('morning-sweets-ar00039.html', '_blank');
+}
+
+function openProductPageProduct14BabyBlue() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00033.html', '_blank');
+}
+
+function openProductPageProduct14SoftPink() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00034.html', '_blank');
+}
+
+function openProductPageProduct14Silver() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00035.html', '_blank');
+}
+
+function openProductPageProduct14White() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00038.html', '_blank');
+}
+
+function openProductPageProduct14Natural() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00036.html', '_blank');
+}
+
+function openProductPageProduct14Lemon() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00037.html', '_blank');
+}
+
+function openProductPageProduct13Black() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00028.html', '_blank');
+}
+    
+function openProductPageProduct13Forest() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00027.html', '_blank');
+}
+
+function openProductPageProduct13OxbloodBlack() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00029.html', '_blank');
+}
+
+function openProductPageProduct13TeamPurple() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00030.html', '_blank');
+}
+
+function openProductPageProduct13HeatherTrueRoyal() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00032.html', '_blank');
+}
+
+function openProductPageProduct13Maroon() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('skate-ar00031.html', '_blank');
+}
+
+function openProductPageProduct11() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('starry-ar00026.html', '_blank');
+}
+
+function openProductPageProduct12() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('/public/cartoon-ar00025.html', '_blank');
+}
+
+function openProductPageProduct10() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('white-shine-ar00024.html', '_blank');
+}
+
+function openProductPageProduct9() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('stay-cool-ar00023.html', '_blank');
+}
+
+function openProductPageProduct8Black() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('elegance-ar00022.html', '_blank');
+}
+
+function openProductPageProduct8White() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('elegance-ar00021.html', '_blank');
+}
+
+function openProductPageProduct7Lavender() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('bold-&-free-ar00018.html', '_blank');
+}
+
+function openProductPageProduct7CottonPink() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('bold-&-free-ar00019.html', '_blank');
+}
+
+function openProductPageProduct7Peach() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('bold-&-free-ar00017.html', '_blank');
+}
+
+function openProductPageProduct7White() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('bold-&-free-ar00020.html', '_blank');
+}
+
+function openProductPageProduct2() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('emerald-ar00002.html', '_blank');
+}
+
+function openProductPageProduct3() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('lavender-glow-ar00003.html', '_blank');
+}
+
+function openProductPageProduct4() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('harmony-ar00004.html', '_blank');
+}
+
+function openProductPageProduct5CottonPink() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('urban-vibes-ar00005.html', '_blank');
+}
+
+function openProductPageProduct5Lavender() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+     window.open('urban-vibes-ar00010.html');
+}
+
+function openProductPageProduct5Blanc() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('urban-vibes-ar00011.html');
+}
+
+function openProductPageProduct5Bordeaux() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('urban-vibes-ar00007.html');
+}
+
+function openProductPageProduct5GrisChiné() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('urban-vibes-ar00012.html');
+}
+
+function openProductPageProduct5BleuChinéFoncé() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('urban-vibes-ar00009.html');
+}
+
+function openProductPageProduct5Marine() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('urban-vibes-ar00006.html');
+}
+
+function openProductPageProduct5Anthracite() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('urban-vibes-ar00008.html');
+}
+
+function openProductPageProduct6Noir() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('bunny-chic-ar00015.html');
+}
+
+function openProductPageProduct16BleuFoncé() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('mad-in-love-ar00040.html');
+}
+
+function openProductPageProduct16Noir() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('mad-in-love-ar00041.html');
+}
+
+function openProductPageProduct17() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('natural-glow-ar00042.html');
+}
+
+function openProductPageProduct18() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('universal-love-ar00043.html');
+}
+</script>
+
+<script>
+    // Sélectionner tous les liens du menu
+    const menuLinks = document.querySelectorAll('.menu a');
+    
+    // Récupérer l'URL actuelle
+    const currentUrl = window.location.href;
+    
+    // Ajouter la classe active au lien correspondant
+    menuLinks.forEach(link => {
+        if (link.href === currentUrl) {
+            link.parentElement.classList.add('active');
+        }
+    });
+</script>
+</body>
+</html>
