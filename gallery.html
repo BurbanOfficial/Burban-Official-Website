@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Burban - Gallery Of Our Latest Articles</title>
+  <!-- Lien vers le fichier CSS -->
+  <link rel="stylesheet" href="styles-gallery.css">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=bevellier@700,500,400&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="gallery-container">
+    <h1>Our Latest Articles</h1>
+    <div class="gallery-grid">
+      <!-- Chaque élément de la galerie correspond à un article -->
+      <div class="gallery-item">
+        <a href="universal-love-ar00043.html" target="_blank">
+          <img src="https://i.imgur.com/r9HQUCq.jpeg" alt="Article 2">
+          <div class="overlay">Discover the <strong>Universal Love</strong> Hoodie</div>
+        </a>
+      </div>
+      <div class="gallery-item">
+        <a href="natural-glow-ar00042.html" target="_blank">
+          <img src="https://i.imgur.com/EcjqfHS.jpeg" alt="Article 3">
+          <div class="overlay">Discover the <strong>Natural Glow</strong> Hoodie</div>
+        </a>
+      </div>
+      <div class="gallery-item">
+        <a href="mad-in-love-ar00040.html" target="_blank">
+          <img src="https://i.imgur.com/aTSbQft.jpeg" alt="Article 1">
+          <div class="overlay">Discover the <strong>Mad In Love</strong> Hoodie</div>
+        </a>
+      </div>
+      <!-- Ajoutez d'autres articles ici -->
+    </div>
+  </div>
+
+<script>
+// Exemple : Ajout d'un effet de log lors du clic sur un article
+    document.querySelectorAll('.gallery-item a').forEach(item => {
+    item.addEventListener('click', () => {
+        console.log("Article ouvert dans un nouvel onglet !");
+    });
+});
+</script>
+</body>
+</html>
