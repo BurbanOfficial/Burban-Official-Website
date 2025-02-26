@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment canceled</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
+  <!-- Favicon -->
+  <link rel="icon" href="https://burbanofficial.com/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="https://burbanofficial.com/favicon.png">
+  <!-- Favicon pour les navigateurs modernes -->
+  <link rel="icon" href="https://burbanofficial.com/favicon.png" sizes="16x16" />
+  <link rel="icon" href="https://burbanofficial.com/favicon.png" sizes="32x32" />
+  <link rel="icon" href="https://burbanofficial.com/favicon.png" sizes="48x48" />
+  <style>
+    /* Réinitialisation basique */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #f8f8f8;
+      font-family: 'Satoshi', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      color: #333;
+    }
+    
+    /* Conteneur de l'animation positionné un peu au-dessus du contenu */
+    .animation-container {
+      margin-bottom: 30px;
+    }
+    
+    /* Style du SVG pour l'animation de refus */
+    .cancelmark {
+      width: 100px;
+      height: 100px;
+    }
+    
+    /* Cercle rouge qui se dessine */
+    .cancelmark__circle {
+      fill: none;
+      stroke: #f44336;
+      stroke-width: 2;
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      animation: drawCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+    
+    /* Croix rouge qui se dessine (deux traits) */
+    .cancelmark__line {
+      fill: none;
+      stroke: #f44336;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 28.3;
+      stroke-dashoffset: 28.3;
+      animation: drawCross 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+    }
+    
+    @keyframes drawCircle {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    
+    @keyframes drawCross {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    
+    /* Styles des messages */
+    h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    
+    p {
+      font-size: 1em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <!-- Animation placée un peu plus haut sur la page -->
+  <div class="animation-container">
+    <svg class="cancelmark" viewBox="0 0 52 52">
+      <circle class="cancelmark__circle" cx="26" cy="26" r="25" />
+      <path class="cancelmark__line" d="M16 16 L36 36" />
+      <path class="cancelmark__line" d="M36 16 L16 36" />
+    </svg>
+  </div>
+  
+  <h1>Payment canceled</h1>
+  <p>You have canceled your payment.</p><br>
+  <h6 id="countdown">You will be redirected in <span id="timer">5</span> seconds.</h6>
+</body>
+<script>
+  setTimeout(function() {
+    window.location.href = "https://burbanofficial.com"; // Remplace par l'URL de destination
+  }, 5000); // Temps en millisecondes (5000ms = 5s)
+</script>
+<script>
+  let countdown = 5; // Nombre de secondes avant la redirection
+  let timerElement = document.getElementById("timer");
+
+  function updateCountdown() {
+    countdown--;
+    timerElement.textContent = countdown;
+    if (countdown <= 0) {
+      window.location.href = "https://burbanofficial.com"; // Remplace par l'URL de destination
+    }
+  }
+
+  setInterval(updateCountdown, 1000); // Met à jour toutes les secondes
+</script>
+</html>
