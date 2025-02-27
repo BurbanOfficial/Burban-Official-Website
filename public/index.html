@@ -179,7 +179,7 @@
           <img src="${item.image}" alt="${item.name}">
           <div class="item-details">
             <p class="item-title">${item.name}</p>
-            <p class="item-size">Taille : ${item.size}</p>
+            <p class="item-size">Size : ${item.size}</p>
             <p class="item-price">${item.price.toFixed(2)}€</p>
             <div class="quantity-controls">
               <button onclick="updateQuantity(${index}, -1)">-</button>
@@ -235,11 +235,11 @@
     async function handleCheckout() {
       const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
       if (cartItems.length === 0) {
-        alert("Votre panier est vide !");
+        alert("Your cart is empty!");
         return;
       }
       // Envoi des articles au serveur pour créer la session Checkout
-      const response = await fetch('/create-checkout-session', {
+      const response = await fetch('https://burban-official-website-stripe-checkout.onrender.com/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items: cartItems })
