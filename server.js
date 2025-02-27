@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const path = require('path');
 // Remplacez 'sk_test_...' par votre clé secrète Stripe
-const stripe = require('stripe')('sk_test_51Q9ORzRwel3656rYCv3vUCOZm5eKMS2KjlqbOcbI3MXLVFy5TZDQFth7DUwCSP5HlIBRrslN2NplWwHfLfaWarL900J9Q4Ns99');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
@@ -42,4 +42,6 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log('Serveur démarré sur le port 3000'));
+// Utilise le port défini par Render, ou 3000 en local
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
