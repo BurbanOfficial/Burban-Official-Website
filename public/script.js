@@ -181,7 +181,7 @@ function closeWindow() {
 // (Optionnel) Exemple de listener pour un bouton checkout dans ce script
 document.getElementById('checkout-button') && document.getElementById('checkout-button').addEventListener('click', async function () {
   try {
-      const response = await fetch('https://burban-official-website-stripe-checkout.onrender.com/create-checkout-session', {
+      const response = await fetch('https://burban-stripe-service.onrender.com/create-checkout-session', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
