@@ -33,8 +33,8 @@ app.post('/create-checkout-session', async (req, res) => {
       discounts: [],
       allow_promotion_codes: true, // ✅ Active le champ "Code Promo" sur Stripe
       mode: 'payment',
-      success_url: 'http://localhost:3000/success.html',
-      cancel_url: 'http://localhost:3000/cancel.html'
+      success_url: 'https://burbanofficial.github.io/Burban-Official-Website/public/success.html',
+      cancel_url: 'https://burbanofficial.github.io/Burban-Official-Website/public/cancel.html'
     });
     res.json({ sessionId: session.id });
   } catch (error) {
