@@ -9,7 +9,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 // Point de terminaison pour créer la session Stripe Checkout
-app.post('https://burban-stripe-service.onrender.com/create-checkout-session', async (req, res) => {
+app.post('/create-checkout-session', async (req, res) => {
   // On attend un tableau d'articles au format : 
   // { id, name, price, quantity, image }
   try {
