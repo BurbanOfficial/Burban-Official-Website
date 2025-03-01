@@ -238,12 +238,12 @@
         alert("Your cart is empty!");
         return;
       }
-      // Envoi des articles au serveur pour créer la session Checkout
+      // Envoyer la requête POST à votre serveur sur Render
       const response = await fetch('https://burban-stripe-service.onrender.com/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: cartItems })
-      });
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: cartItems })
+        });
       const data = await response.json();
       if (data.error) {
         alert(data.error);
