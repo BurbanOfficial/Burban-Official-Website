@@ -2,18 +2,18 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-// Remplacez 'sk_test_...' par votre clé secrète Stripe
+const cors = require('cors');
+// La clé Stripe doit être définie dans Render via une variable d'environnement (STRIPE_SECRET_KEY)
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors()); // Autorise toutes les origines (ou vous pouvez restreindre à votre domaine si nécessaire)
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Point de terminaison pour créer la session Stripe Checkout
+// Définition de la route en mode POST avec un chemin relatif
 app.post('/create-checkout-session', async (req, res) => {
-  // On attend un tableau d'articles au format : 
-  // { id, name, price, quantity, image }
   try {
-    const { items } = req.body;
+    const { items } = req.body; // On attend que le client envoie { items: [...] }
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       billing_address_collection: 'required',
@@ -31,17 +31,19 @@ app.post('/create-checkout-session', async (req, res) => {
         quantity: item.quantity,
       })),
       discounts: [],
-      allow_promotion_codes: true, // ✅ Active le champ "Code Promo" sur Stripe
+      allow_promotion_codes: true, // Active le champ "Code Promo" natif de Stripe
       mode: 'payment',
+      // Remplacez ces URLs par vos URLs de succès et d'annulation en production
       success_url: 'https://burbanofficial.github.io/Burban-Official-Website/public/success.html',
       cancel_url: 'https://burbanofficial.github.io/Burban-Official-Website/public/cancel.html'
     });
-    res.json({ sessionId: session.id });
+    // On renvoie l'URL de la session Stripe pour rediriger l'utilisateur
+    res.json({ sessionId: session.id, url: session.url });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Utilise le port défini par Render, ou 3000 en local
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
