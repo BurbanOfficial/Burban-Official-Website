@@ -1,15 +1,21 @@
 // server.js
+const cors = require('cors');
+app.use(cors());
 const express = require('express');
 const app = express();
 const path = require('path');
 // Remplacez 'sk_test_...' par votre clé secrète Stripe
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error("Erreur : STRIPE_SECRET_KEY n'est pas défini.");
+  process.exit(1);
+}
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 // Point de terminaison pour créer la session Stripe Checkout
-app.post('https://burban-stripe-service.onrender.com/create-checkout-session', async (req, res) => {
+app.post('/create-checkout-session', async (req, res) => {
   // On attend un tableau d'articles au format : 
   // { id, name, price, quantity, image }
   try {
