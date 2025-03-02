@@ -330,7 +330,7 @@
         }
         // Réinitialisation du bouton juste avant la redirection vers Stripe
         resetButton();
-        const stripe = Stripe('pk_test_51Q9ORzRwel3656rYJlUj8k1U3WIaRCLY3VyXH5iaBOujGY6mgaYAMXeJSvfbz6kUgNdXW6VWXqWheXhAa3gGZSmH001jacudkb');
+        const stripe = Stripe('pk_live_51Q9ORzRwel3656rYkt2acyiz7KoCl1mJA6ru04LPlGQmt5Iw9BcTQa16qv5O0Ozte9bMCtutah1qh4r6yds3l2p000MPG83KmB');
         stripe.redirectToCheckout({ sessionId: data.sessionId });
       } catch (error) {
         console.error(error);
