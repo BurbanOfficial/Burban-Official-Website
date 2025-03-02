@@ -10,9 +10,11 @@
   <!-- Favicon -->
   <link rel="icon" href="https://burbanofficial.com/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="https://burbanofficial.com/favicon.png">
+  <!-- Favicon pour les navigateurs modernes -->
   <link rel="icon" href="https://burbanofficial.com/favicon.png" sizes="16x16" />
   <link rel="icon" href="https://burbanofficial.com/favicon.png" sizes="32x32" />
   <link rel="icon" href="https://burbanofficial.com/favicon.png" sizes="48x48" />
+  <!-- CSS minimaliste, professionnel et animé -->
   <style>
     body {
       font-family: 'Satoshi', sans-serif;
@@ -68,7 +70,7 @@
       margin-top: 5px;
     }
     .quantity-controls button {
-      background: linear-gradient(145deg, #e6e6e6, #ffffff);
+      background: linear-gradient(145deg, #e6e6e6, #ffffff); /* Effet de lumière doux */
       border: 1px solid #ccc;
       padding: 5px 10px;
       margin: 0 5px;
@@ -78,7 +80,7 @@
       font-size: 16px;
       font-weight: bold;
       color: #333;
-      box-shadow: 3px 3px 6px #d1d1d1, -3px -3px 6px #ffffff;
+      box-shadow: 3px 3px 6px #d1d1d1, -3px -3px 6px #ffffff; /* Effet de profondeur subtil */
     }
     .quantity-controls button:hover {
       background: linear-gradient(145deg, #ffffff, #f0f0f0);
@@ -127,24 +129,59 @@
     .checkout-btn:hover {
       background: #90bed6;
     }
-    .checkout-btn:disabled {
-      background: #333;
-      cursor: not-allowed;
-    }
   </style>
+  <!-- Stripe.js -->
   <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
   <div class="cart-container">
     <h1>My Cart</h1>
     <div id="cart-items"></div>
+    <!-- Section des réductions -->
+    <div id="discount-section">
+      <h2>Réductions disponibles</h2>
+      <label for="discount-5">5€ (500 points)</label>
+      <input type="checkbox" id="discount-5" data-value="5" disabled>
+
+      <label for="discount-10">10€ (1000 points)</label>
+      <input type="checkbox" id="discount-10" data-value="10" disabled>
+
+      <label for="discount-20">20€ (2000 points)</label>
+      <input type="checkbox" id="discount-20" data-value="20" disabled>
+
+      <label for="discount-30">30€ (2500 points)</label>
+      <input type="checkbox" id="discount-30" data-value="30" disabled>
+    </div>
     <div class="total">Total : <span id="cart-total">0.00€</span></div>
-    <button id="checkout-btn" class="checkout-btn" onclick="handleCheckout()">
-      <span id="checkout-btn-text">Proceed to payment</span>&nbsp;&nbsp;<i class="fa-solid fa-credit-card"></i>
-    </button>
+    <button class="checkout-btn" onclick="handleCheckout()">Proceed to payment&nbsp;&nbsp;<i class="fa-solid fa-credit-card"></i></button>
   </div>
 
   <script>
+    /* 
+      Structure attendue dans le localStorage pour chaque article :
+      {
+        id: 'prod_1',
+        name: 'Hoodie Cartoon',
+        price: 59.99, // en euros
+        quantity: 1,
+        image: 'URL de l’image'
+      }
+      
+      Pour les tests, on initialise un exemple si le panier est vide.
+    */
+    /* if (!localStorage.getItem('cartItems')) {
+      const sampleItems = [
+        {
+          id: 'prod_1',
+          name: 'Hoodie Cartoon',
+          price: 59.99,
+          quantity: 1,
+          image: 'https://i.imgur.com/3A3fP9Z.jpeg'
+        }
+      ];
+      localStorage.setItem('cartItems', JSON.stringify(sampleItems));
+    } */
+
     // Chargement et affichage du panier
     function loadCart() {
       const cartItemsContainer = document.getElementById('cart-items');
@@ -157,7 +194,7 @@
           <img src="${item.image}" alt="${item.name}">
           <div class="item-details">
             <p class="item-title">${item.name}</p>
-            <p class="item-size">Size : ${item.size || 'N/A'}</p>
+            <p class="item-size">Size : ${item.size}</p>
             <p class="item-price">${item.price.toFixed(2)}€</p>
             <div class="quantity-controls">
               <button onclick="updateQuantity(${index}, -1)">-</button>
@@ -172,7 +209,7 @@
       updateTotal();
     }
 
-    // Mise à jour de la quantité
+    // Mise à jour de la quantité via les boutons "+" et "-"
     function updateQuantity(index, delta) {
       let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
       let newQuantity = parseInt(cartItems[index].quantity) + delta;
@@ -202,73 +239,34 @@
       loadCart();
     }
 
-    // Calcul et affichage du total
+    // Calcul et affichage du total du panier
     function updateTotal() {
       const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
       const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
       document.getElementById('cart-total').innerText = total.toFixed(2) + '€';
     }
 
-    // Lancement du paiement via Stripe Checkout avec estimation "réelle"
+    // Lancement du paiement via Stripe Checkout
     async function handleCheckout() {
-      const checkoutBtn = document.getElementById('checkout-btn');
-      const checkoutBtnText = document.getElementById('checkout-btn-text');
-      checkoutBtn.disabled = true;
-
-      // Récupérer la durée moyenne stockée (en secondes), ou utiliser une valeur par défaut
-      let avgTime = parseFloat(localStorage.getItem('avgCheckoutTime')) || defaultAvgTime;
-      
-      const startTime = Date.now();
-      // Affichage initial avec l'estimation totale
-      checkoutBtnText.textContent = `Loading (estimation : ${Math.round(avgTime)}s)`;
-
-      // Mise à jour en temps réel : estimation restante = moyenne - temps écoulé
-      const countdownInterval = setInterval(() => {
-        const elapsed = (Date.now() - startTime) / 1000;
-        const remaining = Math.max(0, avgTime - elapsed);
-        checkoutBtnText.textContent = `Loading (estimation : ${Math.round(remaining)}s)`;
-      }, 500);
-
-      try {
-        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-        if (cartItems.length === 0) {
-          alert("Your cart is empty!");
-          clearInterval(countdownInterval);
-          checkoutBtn.disabled = false;
-          checkoutBtnText.textContent = 'Proceed to payment';
-          return;
-        }
-        // Envoi de la requête de création de session
-        const response = await fetch('https://burban-stripe-service.onrender.com/create-checkout-session', {
+      const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+      if (cartItems.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      // Envoyer la requête POST à votre serveur sur Render
+      const response = await fetch('https://burban-stripe-service.onrender.com/create-checkout-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: cartItems })
         });
-        const data = await response.json();
-        if (data.error) {
-          alert(data.error);
-          clearInterval(countdownInterval);
-          checkoutBtn.disabled = false;
-          checkoutBtnText.textContent = 'Proceed to payment';
-          return;
-        }
-        // Mesure du temps réel de réponse
-        const actualTime = (Date.now() - startTime) / 1000;
-        // Mise à jour de la moyenne (pondération : 80% de l'ancienne moyenne, 20% du temps actuel)
-        const newAvg = avgTime * 0.8 + actualTime * 0.2;
-        localStorage.setItem('avgCheckoutTime', newAvg.toString());
-        
-        clearInterval(countdownInterval);
-        // Redirection vers Stripe Checkout
-        const stripe = Stripe('pk_test_51Q9ORzRwel3656rYJlUj8k1U3WIaRCLY3VyXH5iaBOujGY6mgaYAMXeJSvfbz6kUgNdXW6VWXqWheXhAa3gGZSmH001jacudkb');
-        stripe.redirectToCheckout({ sessionId: data.sessionId });
-      } catch (error) {
-        console.error(error);
-        alert("An error has occurred. Please try again.");
-        clearInterval(countdownInterval);
-        checkoutBtn.disabled = false;
-        checkoutBtnText.textContent = 'Proceed to payment';
+      const data = await response.json();
+      if (data.error) {
+        alert(data.error);
+        return;
       }
+      // Remplacez 'pk_test_...' par votre clé publique Stripe
+      const stripe = Stripe('pk_test_51Q9ORzRwel3656rYJlUj8k1U3WIaRCLY3VyXH5iaBOujGY6mgaYAMXeJSvfbz6kUgNdXW6VWXqWheXhAa3gGZSmH001jacudkb');
+      stripe.redirectToCheckout({ sessionId: data.sessionId });
     }
 
     document.addEventListener('DOMContentLoaded', loadCart);
