@@ -34,8 +34,8 @@ app.post('/create-checkout-session', async (req, res) => {
       allow_promotion_codes: true, // Active le champ "Code Promo" natif de Stripe
       mode: 'payment',
       // Remplacez ces URLs par vos URLs de succès et d'annulation en production
-      success_url: 'https://burbanofficial.github.io/Burban-Official-Website/public/success.html',
-      cancel_url: 'https://burbanofficial.github.io/Burban-Official-Website/public/cancel.html'
+      success_url: 'https://burbanofficial.com/public/success.html',
+      cancel_url: 'https://burbanofficial.com/public/cancel.html'
     });
     // On renvoie l'URL de la session Stripe pour rediriger l'utilisateur
     res.json({ sessionId: session.id, url: session.url });
