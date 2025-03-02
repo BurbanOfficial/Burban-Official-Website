@@ -123,7 +123,6 @@
       cursor: pointer;
       transition: background 0.3s;
       margin-top: 20px;
-      position: relative;
     }
     .checkout-btn:hover {
       background: #90bed6;
@@ -131,11 +130,6 @@
     .checkout-btn:disabled {
       background: #333;
       cursor: not-allowed;
-    }
-    /* Style minimal pour les points animés */
-    #loading-dots {
-      margin-left: 5px;
-      font-weight: bold;
     }
   </style>
   <script src="https://js.stripe.com/v3/"></script>
@@ -146,8 +140,7 @@
     <div id="cart-items"></div>
     <div class="total">Total : <span id="cart-total">0.00€</span></div>
     <button id="checkout-btn" class="checkout-btn" onclick="handleCheckout()">
-      <span id="checkout-btn-text">Proceed to payment</span>
-      <span id="loading-dots" style="display: none;"></span>&nbsp;&nbsp;<i class="fa-solid fa-credit-card"></i>
+      <span id="checkout-btn-text">Proceed to payment</span>&nbsp;&nbsp;<i class="fa-solid fa-credit-card"></i>
     </button>
   </div>
 
@@ -216,34 +209,36 @@
       document.getElementById('cart-total').innerText = total.toFixed(2) + '€';
     }
 
-    // Lancement du paiement via Stripe Checkout avec animation de chargement
+    // Lancement du paiement via Stripe Checkout avec estimation "réelle"
     async function handleCheckout() {
       const checkoutBtn = document.getElementById('checkout-btn');
       const checkoutBtnText = document.getElementById('checkout-btn-text');
-      const loadingDots = document.getElementById('loading-dots');
-      
-      // Désactivation et affichage de l'animation
       checkoutBtn.disabled = true;
-      checkoutBtnText.textContent = 'Chargement';
-      loadingDots.style.display = 'inline';
-      let dotsInterval = setInterval(() => {
-        if (loadingDots.textContent.length >= 3) {
-          loadingDots.textContent = '';
-        } else {
-          loadingDots.textContent += '.';
-        }
+
+      // Récupérer la durée moyenne stockée (en secondes), ou utiliser une valeur par défaut
+      let avgTime = parseFloat(localStorage.getItem('avgCheckoutTime')) || defaultAvgTime;
+      
+      const startTime = Date.now();
+      // Affichage initial avec l'estimation totale
+      checkoutBtnText.textContent = `Loading (estimation : ${Math.round(avgTime)}s)`;
+
+      // Mise à jour en temps réel : estimation restante = moyenne - temps écoulé
+      const countdownInterval = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        const remaining = Math.max(0, avgTime - elapsed);
+        checkoutBtnText.textContent = `Loading (estimation : ${Math.round(remaining)}s)`;
       }, 500);
 
       try {
         const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
         if (cartItems.length === 0) {
-          alert("Votre panier est vide!");
-          clearInterval(dotsInterval);
+          alert("Your cart is empty!");
+          clearInterval(countdownInterval);
           checkoutBtn.disabled = false;
           checkoutBtnText.textContent = 'Proceed to payment';
-          loadingDots.style.display = 'none';
           return;
         }
+        // Envoi de la requête de création de session
         const response = await fetch('https://burban-stripe-service.onrender.com/create-checkout-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -252,21 +247,27 @@
         const data = await response.json();
         if (data.error) {
           alert(data.error);
-          clearInterval(dotsInterval);
+          clearInterval(countdownInterval);
           checkoutBtn.disabled = false;
           checkoutBtnText.textContent = 'Proceed to payment';
-          loadingDots.style.display = 'none';
           return;
         }
+        // Mesure du temps réel de réponse
+        const actualTime = (Date.now() - startTime) / 1000;
+        // Mise à jour de la moyenne (pondération : 80% de l'ancienne moyenne, 20% du temps actuel)
+        const newAvg = avgTime * 0.8 + actualTime * 0.2;
+        localStorage.setItem('avgCheckoutTime', newAvg.toString());
+        
+        clearInterval(countdownInterval);
+        // Redirection vers Stripe Checkout
         const stripe = Stripe('pk_test_51Q9ORzRwel3656rYJlUj8k1U3WIaRCLY3VyXH5iaBOujGY6mgaYAMXeJSvfbz6kUgNdXW6VWXqWheXhAa3gGZSmH001jacudkb');
         stripe.redirectToCheckout({ sessionId: data.sessionId });
       } catch (error) {
         console.error(error);
-        alert("Une erreur s'est produite. Veuillez réessayer.");
-        clearInterval(dotsInterval);
+        alert("An error has occurred. Please try again.");
+        clearInterval(countdownInterval);
         checkoutBtn.disabled = false;
         checkoutBtnText.textContent = 'Proceed to payment';
-        loadingDots.style.display = 'none';
       }
     }
 
