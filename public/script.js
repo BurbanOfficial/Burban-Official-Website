@@ -64,7 +64,7 @@ function addToCart() {
   let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
   cart.push(product);
   localStorage.setItem('cartItems', JSON.stringify(cart));
-  alert("Produit ajouté au panier !");
+  alert("Product added to cart!");
 }
 
 // Fonction pour mettre à jour l'affichage de la barre de prix (si applicable)
@@ -99,7 +99,7 @@ function filterProducts() {
   });
 
   if (visibleCount === 0) {
-    alert("Aucun produit ne correspond aux filtres sélectionnés.");
+    alert("No products match the selected filters.");
   }
 }
 
