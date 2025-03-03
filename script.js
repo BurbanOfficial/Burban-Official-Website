@@ -90,7 +90,7 @@ let selectedSize = "";
 
     // Message d'alerte si aucun produit n'est visible
     if (visibleCount === 0) {
-        alert("Aucun produit ne correspond aux filtres sélectionnés.");
+        alert("No products match the selected filters.");
     }
 }
 
