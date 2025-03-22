@@ -7,6 +7,7 @@
   <!-- Intégration de Google Fonts pour un rendu élégant -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" rel="stylesheet">
   <!-- Favicon -->
   <link rel="icon" href="https://i.imgur.com/CCC34mn.png" type="image/png">
   <link rel="apple-touch-icon" href="https://i.imgur.com/CCC34mn.png">
@@ -78,6 +79,35 @@
       .section h2 {
         font-size: 1.8em;
       }
+    }
+
+    .download-btn {
+      display: block;
+      width: 200px;
+      margin: 30px auto;
+      padding: 15px;
+      background-color: #90bed6; /* Same color as header */
+      color: white;
+      font-size: 1.2em;
+      text-align: center;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    .download-btn:hover {
+      background-color: #7fa6c9; /* Slightly darker shade for hover effect */
+    }
+
+    select {
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: none;
+      background-color: #fff;
+      color: #000;
     }
   </style>
 </head>
@@ -215,6 +245,15 @@
       </p>
     </section>
     <p><strong>Updated on 22/03/2025</strong></p>
+    <div class="footer">
+      <p>Select your language to download the PDF</p>
+      <!-- Menu déroulant pour choisir la langue -->
+      <select id="languageSelect">
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+      </select>
+      <button class="download-btn" onclick="downloadPDF()"><i class="fa-solid fa-download"></i></button>
+    </div>
 
     <footer class="footer">
       <div style="font-size: 14px;">
@@ -225,6 +264,22 @@
   <script>
     // Mise à jour automatique de l'année
     document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+<script>
+  function downloadPDF() {
+    var selectedLanguage = document.getElementById("languageSelect").value;
+    var pdfURL = '';
+
+    if (selectedLanguage === 'fr') {
+      pdfURL = 'https://www.burbanofficial.com/Conditions%20G%C3%A9n%C3%A9rales%20de%20Vente%20(CGV)%20-%20FR%20-%2022-03-2025.pdf'; // Lien vers le PDF en français
+    } else if (selectedLanguage === 'en') {
+      pdfURL = 'https://www.burbanofficial.com/Conditions%20G%C3%A9n%C3%A9rales%20de%20Vente%20(CGV)%20-%20EN%20-%2022-03-2025.pdf'; // Lien vers le PDF en anglais
+    }
+
+    if (pdfURL) {
+      window.location.href = pdfURL; // Télécharger le fichier PDF
+    }
+  }
 </script>
 </body>
 </html>
