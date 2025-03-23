@@ -1134,6 +1134,6 @@ footer {
 /* Ordinateurs standards (largeur entre 1025px et 1440px) */
 @media screen and (min-width: 1025px) and (max-width: 1850px) {
     .about-burban {
-        height: 340vh;
+        height: 400vh;
     }
 }
