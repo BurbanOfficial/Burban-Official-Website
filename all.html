@@ -734,6 +734,25 @@
 <!-- Affichage de tous les articles dans la page de découverte des articles dans la boutique -->
 <div class="shop-container">
     <div class="shop-container">
+        <div class="product-card" data-category="t-shirt" data-color="rouge rose blanc" data-price="33.99" onmouseover="showImage(this, 'https://i.imgur.com/rul03FX.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/sfV3Vfw.jpeg')" onclick="openProductPageProduct22()">
+            <!-- Étiquette respectueuse de l'environnement -->
+        <div class="eco-label">
+            <span class="eco-icon">🌱</span>
+        <!-- Bulle d'information (cachée par défaut) -->
+        <div class="eco-tooltip">
+            This product is environmentally friendly.
+        </div>
+        </div>
+            <img src="https://i.imgur.com/sfV3Vfw.jpeg" alt="Produit 22" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">Celestial B</h3>
+                <h6 class="product-categorie">T-Shirt</h6>
+                <!-- Cercle de couleur personnalisé -->
+                <p class="product-price">33,99€</p>
+                <button class="view-product-button" onclick="openProductPageProduct22(); event.stopPropagation();">Discover</button>
+            </div>
+        </div>
+
         <div class="product-card" data-category="casquette" data-color="noir vert" data-price="29.99" onmouseover="showImage(this, 'https://i.imgur.com/pVl5eoZ.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/U0oUcsA.jpeg')" onclick="openProductPageProduct21()">
             <!-- Étiquette respectueuse de l'environnement -->
         <div class="eco-label">
@@ -1499,6 +1518,11 @@ function openProductPageProduct20() {
 function openProductPageProduct21() {
     // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
     window.open('https://burbanofficial.com/public/urban-crest-ar00046.html', '_blank');
+}
+
+function openProductPageProduct22() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('https://burbanofficial.com/public/celestial-b-ar00049.html', '_blank');
 }
 </script>
 
