@@ -323,21 +323,21 @@ footer {
 
 @media (max-width: 768px) {
     .online-shop {
-        height: 1220vh;
+        height: 1250vh;
     }
 }
 
 /* Tablettes (paysage) et petits ordinateurs portables (largeur entre 769px et 1024px) */
 @media screen and (min-width: 769px) and (max-width: 1024px) {
     .online-shop {
-        height: 1018vh;
+        height: 1110vh;
     }
 }
 
 /* Ordinateurs standards (largeur entre 1025px et 1440px) */
 @media screen and (min-width: 1025px) and (max-width: 1850px) {
     .online-shop {
-        height: 368vh;
+        height: 400vh;
     }
 }
 /* ------------------------------------------------ Header déroulant ------------------------------------------------*/
