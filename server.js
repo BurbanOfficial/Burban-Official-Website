@@ -6,8 +6,6 @@ const cors = require('cors');
 // La clé Stripe doit être définie dans Render via une variable d'environnement (STRIPE_SECRET_KEY)
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-const axios = require('axios');
-
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -138,8 +136,6 @@ app.post('/create-checkout-session', async (req, res) => {
   try {
     // On attend que le client envoie { items: [...], region: "europe" }
     const { items, region } = req.body;
-    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress; // Récupère l'IP du client
-    const countryCode = await getClientLocation(clientIp); // Récupère le pays du client
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "No items in the cart." });
     }
