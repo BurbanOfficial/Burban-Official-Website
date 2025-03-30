@@ -213,8 +213,7 @@
     <h1>My Cart</h1>
     <div id="cart-items"></div>
     <div class="total">Total : <span id="cart-total">0.00€</span></div>
-    <!-- Redirection vers shipping-cost.html lors du clic -->
-    <button id="checkout-btn" class="checkout-btn" onclick="window.location.href='F:/Working-Stripe-Website/shipping-cost/shipping-cost.html'">
+    <button id="checkout-btn" class="checkout-btn" onclick="handleCheckout()">
       <span id="checkout-btn-text">Proceed to payment</span>
       <div class="loader" id="loader" style="display:none;"></div>
       <span id="card-icon"><i class="fa-solid fa-credit-card"></i></span>
@@ -286,7 +285,63 @@
       document.getElementById('cart-total').innerText = total.toFixed(2) + '€';
     }
 
+    // Réinitialiser l'état du bouton
+    function resetButton() {
+      const checkoutBtn = document.getElementById('checkout-btn');
+      const checkoutBtnText = document.getElementById('checkout-btn-text');
+      const loader = document.getElementById('loader');
+      const cardIcon = document.getElementById('card-icon');
+      checkoutBtn.disabled = false;
+      checkoutBtnText.style.display = 'inline';
+      loader.style.display = 'none';
+      cardIcon.style.display = 'inline-block';
+    }
+
+    // Lancement du paiement via Stripe Checkout avec animation de chargement personnalisée
+    async function handleCheckout() {
+      const checkoutBtn = document.getElementById('checkout-btn');
+      const checkoutBtnText = document.getElementById('checkout-btn-text');
+      const loader = document.getElementById('loader');
+      const cardIcon = document.getElementById('card-icon');
+
+      // Désactivation et affichage du loader, masquage de l'icône
+      checkoutBtn.disabled = true;
+      checkoutBtnText.style.display = 'none';
+      loader.style.display = 'inline-block';
+      cardIcon.style.display = 'none';
+
+      try {
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+        if (cartItems.length === 0) {
+          alert("Your cart is empty!");
+          resetButton();
+          return;
+        }
+        const response = await fetch('https://burban-stripe-service.onrender.com/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: cartItems })
+        });
+        const data = await response.json();
+        if (data.error) {
+          alert(data.error);
+          resetButton();
+          return;
+        }
+        // Réinitialisation du bouton juste avant la redirection vers Stripe
+        resetButton();
+        const stripe = Stripe('pk_live_51Q9ORzRwel3656rYkt2acyiz7KoCl1mJA6ru04LPlGQmt5Iw9BcTQa16qv5O0Ozte9bMCtutah1qh4r6yds3l2p000MPG83KmB');
+        stripe.redirectToCheckout({ sessionId: data.sessionId });
+      } catch (error) {
+        console.error(error);
+        alert("An error has occurred. Please try again.");
+        resetButton();
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      // S'assurer que le loader est masqué au chargement de la page
+      document.getElementById('loader').style.display = 'none';
       loadCart();
     });
   </script>
