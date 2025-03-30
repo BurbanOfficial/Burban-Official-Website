@@ -33,7 +33,7 @@ function selectSize(element) {
   element.classList.add('selected');
   // Cache le message d'erreur s'il était affiché
   document.getElementById('errorMessage').style.display = 'none';
-  // Affiche le bouton "Add to Cart"
+  // Affiche le bouton "Add to Cart" (si caché)
   document.getElementById('addToCartBtn').style.display = 'inline-block';
 }
 
@@ -60,12 +60,29 @@ function addToCart() {
     quantity: 1
   };
 
-  // Récupération et mise à jour du panier dans le localStorage (clé "cartItems")
+  // Mise à jour du panier dans le localStorage
   let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
   cart.push(product);
   localStorage.setItem('cartItems', JSON.stringify(cart));
-  alert("Product added to cart!");
+
+  // Affiche la modale de confirmation
+  showCartModal();
 }
+
+function showCartModal() {
+  const modal = document.getElementById('cartModal');
+  modal.style.display = 'flex';
+}
+
+// Bouton "Continuer vos achats" : ferme la modale
+document.getElementById('continueBtn').addEventListener('click', () => {
+  document.getElementById('cartModal').style.display = 'none';
+});
+
+// Bouton "Voir le panier" : redirige vers la page panier
+document.getElementById('viewCartBtn').addEventListener('click', () => {
+  window.location.href = 'cart.html'; // Adaptez l'URL selon votre projet
+});
 
 // Fonction pour mettre à jour l'affichage de la barre de prix (si applicable)
 function updatePriceDisplay(value) {
