@@ -105,10 +105,10 @@ const shippingRates = {
  */
 function getCategory(item) {
   const name = item.name.toLowerCase();
-  if (name.includes("t-shirt") || name.includes("tshirt") || name.includes("débardeur") || name.includes("polo") || name.includes("crop-top")) {
+  if (name.includes("t-shirt") || name.includes("débardeur") || name.includes("polo") || name.includes("crop-top")) {
     return "category1";
   }
-  if (name.includes("sweat à capuche") || name.includes("pull") || name.includes("veste") || name.includes("pantalon de sport") || name.includes("pantalon de survêtement")) {
+  if (name.includes("sweat à capuche") || name.includes("Crewneck Sweatshirt") || name.includes("pull") || name.includes("veste") || name.includes("pantalon de sport") || name.includes("pantalon de survêtement")) {
     return "category2";
   }
   if (name.includes("hoodie") || name.includes("sweatshirt") || name.includes("jacket") || name.includes("pants") || name.includes("joggers")) {
