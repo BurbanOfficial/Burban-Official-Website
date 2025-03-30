@@ -4,6 +4,13 @@ const app = express();
 const path = require('path');
 const cors = require('cors');
 const geoip = require('geoip-lite');
+
+app.get('/geoip', (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  const geo = geoip.lookup(ip);
+  res.json({ ip, geo });
+});
+
 // La clé Stripe doit être définie dans Render via une variable d'environnement (STRIPE_SECRET_KEY)
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
