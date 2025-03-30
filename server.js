@@ -117,7 +117,7 @@ function getCategory(item) {
   if (name.includes("coupe-vent") || name.includes("pyjama")) {
     return "category5";
   }
-  if (name.includes("casquette") || name.includes("bonnet") || name.includes("bob") || name.includes("visière")) {
+  if (name.includes("casquette") || name.includes("cap") || name.includes("bonnet") || name.includes("beanie") || name.includes("bob") || name.includes("visière")) {
     return "category6";
   }
   return "category3"; // Par défaut
