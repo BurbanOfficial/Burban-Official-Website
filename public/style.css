@@ -966,3 +966,55 @@ body {
         @media only screen and (min-width: 1200px) {
             /*CSS rules for desktops */
         }
+    
+/* Message produit ajouté au panier */
+/* Fenêtre modale en overlay */
+.modal2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  /* Contenu de la modale */
+  .modal2-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 30px 20px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    animation: modalFadeIn 0.5s ease;
+  }
+  
+  /* Boutons de la modale */
+  .modal2-buttons {
+    margin-top: 20px;
+  }
+  .modal2-buttons button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #333;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .modal2-buttons button:hover {
+    background-color: #555;
+  }
+  
+  /* Animation d'apparition de la modale */
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  

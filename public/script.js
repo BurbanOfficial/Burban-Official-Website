@@ -81,7 +81,7 @@ document.getElementById('continueBtn').addEventListener('click', () => {
 
 // Bouton "Voir le panier" : redirige vers la page panier
 document.getElementById('viewCartBtn').addEventListener('click', () => {
-  window.location.href = 'cart.html'; // Adaptez l'URL selon votre projet
+  window.location.href = 'https://burbanofficial.com/cart.html'; // Adaptez l'URL selon votre projet
 });
 
 // Fonction pour mettre à jour l'affichage de la barre de prix (si applicable)
