@@ -6,9 +6,11 @@ const cors = require('cors');
 const geoip = require('geoip-lite');
 
 app.get('/geoip', (req, res) => {
-  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  const geo = geoip.lookup(ip);
-  res.json({ ip, geo });
+  // Extraire la première adresse IP de la liste dans x-forwarded-for
+  const ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0] : req.connection.remoteAddress;
+
+  const geo = geoip.lookup(ip); // Chercher l'information GeoIP
+  res.json({ ip, geo }); // Retourner l'IP et la localisation
 });
 
 // La clé Stripe doit être définie dans Render via une variable d'environnement (STRIPE_SECRET_KEY)
