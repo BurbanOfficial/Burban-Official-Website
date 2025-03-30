@@ -137,7 +137,7 @@ app.post('/create-checkout-session', async (req, res) => {
     // On attend que le client envoie { items: [...], region: "europe" }
     const { items, region } = req.body;
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: "No items in the cart." });
+      return res.status(400).json({ error: "Aucun article dans le panier." });
     }
     // Normalisation de la région (en minuscule)
     const regionNormalized = region ? region.toLowerCase() : "worldwide";
@@ -148,7 +148,7 @@ app.post('/create-checkout-session', async (req, res) => {
         currency: 'eur',
         product_data: {
           name: item.name,
-          description: "Size : " + item.size,
+          description: "Taille : " + item.size,
           images: [item.image],
         },
         unit_amount: Math.round(item.price * 100),
@@ -167,7 +167,7 @@ app.post('/create-checkout-session', async (req, res) => {
         price_data: {
           currency: 'eur',
           product_data: {
-            name: "Delivery Costs",
+            name: "Frais de Livraison",
           },
           unit_amount: shippingTotal,
         },
@@ -178,7 +178,6 @@ app.post('/create-checkout-session', async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       billing_address_collection: 'required',
-      shipping_address_collection: 'required',
       line_items: lineItems,
       discounts: [],
       allow_promotion_codes: true,
