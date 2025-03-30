@@ -36,7 +36,7 @@ const shippingRates = {
     australia: { unique: 9.79, additional: 1.80 },
     japan:     { unique: 5.99, additional: 2.00 },
     brazil:    { unique: 5.39, additional: 2.70 },
-    worldwide: { unique: 6.29, additional: 2.00 }
+    worldwide: { unique: 6.29, additional: 2.00 } // Valeur par défaut identique à Europe
   },
   category3: { // Troisième grille tarifaire
     us:        { unique: 9.79, additional: 4.90 },
@@ -117,28 +117,6 @@ function getCategory(item) {
 }
 
 /**
- * Extrait la région de l'adresse de livraison.
- * Cette fonction utilise une logique simple basée sur des mots-clés.
- * Vous pouvez l'adapter ou utiliser une API de géolocalisation pour plus de précision.
- * 
- * @param {string} address - L'adresse de livraison
- * @returns {string} La région déduite (ex. "us", "europe", "uk", etc.)
- */
-function getRegionFromAddress(address) {
-  const addr = address.toLowerCase();
-  if (addr.includes("usa") || addr.includes("united states") || addr.includes("us")) return "us";
-  if (addr.includes("uk") || addr.includes("united kingdom")) return "uk";
-  if (addr.includes("canada")) return "canada";
-  if (addr.includes("japan") || addr.includes("nippon")) return "japan";
-  if (addr.includes("brazil") || addr.includes("brasil")) return "brazil";
-  if (addr.includes("australia") || addr.includes("new zealand") || addr.includes("nouvelle-zélande")) return "australia";
-  // Pour l'Europe, vous pouvez ajouter plusieurs pays. Ici, on utilise une règle simple pour la France, l'Allemagne, etc.
-  if (addr.includes("france") || addr.includes("germany") || addr.includes("italy") || addr.includes("spain") || addr.includes("europe")) return "europe";
-  // Si rien ne correspond, on retourne worldwide
-  return "worldwide";
-}
-
-/**
  * Calcule le coût de livraison pour un article, en fonction de sa catégorie, sa quantité et la région.
  * @param {Object} item - L'article du panier (doit contenir name et quantity)
  * @param {string} region - La région de livraison (en minuscule)
@@ -156,16 +134,13 @@ function getShippingCost(item, region) {
 
 app.post('/create-checkout-session', async (req, res) => {
   try {
-    // On attend que le client envoie { items: [...], address: "..." }
-    const { items, address } = req.body;
+    // On attend que le client envoie { items: [...], region: "europe" }
+    const { items, region } = req.body;
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Aucun article dans le panier." });
     }
-    if (!address) {
-      return res.status(400).json({ error: "L'adresse de livraison est requise." });
-    }
-    // Déduire la région à partir de l'adresse de livraison
-    const regionNormalized = getRegionFromAddress(address);
+    // Normalisation de la région (en minuscule)
+    const regionNormalized = region ? region.toLowerCase() : "worldwide";
 
     // Création des line_items pour les produits
     const productLineItems = items.map(item => ({
