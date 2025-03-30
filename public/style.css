@@ -1003,13 +1003,13 @@ body {
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
-    background-color: #333;
+    background-color: #000000;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
   .modal2-buttons button:hover {
-    background-color: #555;
+    background-color: #000000;
   }
   
   /* Animation d'apparition de la modale */
