@@ -6,6 +6,8 @@ const cors = require('cors');
 // La clé Stripe doit être définie dans Render via une variable d'environnement (STRIPE_SECRET_KEY)
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+const axios = require('axios');
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -136,8 +138,10 @@ app.post('/create-checkout-session', async (req, res) => {
   try {
     // On attend que le client envoie { items: [...], region: "europe" }
     const { items, region } = req.body;
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress; // Récupère l'IP du client
+    const countryCode = await getClientLocation(clientIp); // Récupère le pays du client
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: "Aucun article dans le panier." });
+      return res.status(400).json({ error: "No items in the cart." });
     }
     // Normalisation de la région (en minuscule)
     const regionNormalized = region ? region.toLowerCase() : "worldwide";
@@ -148,7 +152,7 @@ app.post('/create-checkout-session', async (req, res) => {
         currency: 'eur',
         product_data: {
           name: item.name,
-          description: "Taille : " + item.size,
+          description: "Size : " + item.size,
           images: [item.image],
         },
         unit_amount: Math.round(item.price * 100),
@@ -167,7 +171,7 @@ app.post('/create-checkout-session', async (req, res) => {
         price_data: {
           currency: 'eur',
           product_data: {
-            name: "Frais de Livraison",
+            name: "Delivery Costs",
           },
           unit_amount: shippingTotal,
         },
@@ -178,6 +182,7 @@ app.post('/create-checkout-session', async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       billing_address_collection: 'required',
+      shipping_address_collection: 'required',
       line_items: lineItems,
       discounts: [],
       allow_promotion_codes: true,
