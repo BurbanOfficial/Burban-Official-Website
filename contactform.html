@@ -215,14 +215,7 @@
 </script>
 
 <script>
-    // Vérifie si 'cartItems' existe dans le localStorage, sinon l'initialise en tableau vide
-    function initCart() {
-      if (!localStorage.getItem('cartItems')) {
-        localStorage.setItem('cartItems', JSON.stringify([]));
-        console.log('Initialisation du panier : []');
-      }
-    }
-  
+    // Fonction pour récupérer et mettre à jour la quantité du panier
     function updateCartCount() {
       let cartItems = localStorage.getItem('cartItems');
       
@@ -237,15 +230,13 @@
         console.error('Erreur lors du parsing de cartItems, réinitialisation.', e);
         cartItems = [];
       }
-      
-      console.log('Nombre d\'articles dans le panier :', cartItems.length);
+  
+      // Met à jour le badge
       document.querySelector('.cart-count').textContent = cartItems.length;
     }
   
-    document.addEventListener('DOMContentLoaded', () => {
-      initCart();
-      updateCartCount();
-    });
+    // Vérification et mise à jour du panier toutes les 500ms
+    setInterval(updateCartCount, 500);  // Cela vérifiera toutes les 500ms pour toute mise à jour
   
     // Fonction d'ajout d'un article dans le panier
     function addItemToCart(item) {
@@ -258,14 +249,32 @@
       } catch (e) {
         cartItems = [];
       }
-      
+  
       cartItems.push(item);
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
-      updateCartCount();
     }
   
-    // Exemple d'utilisation (à adapter selon votre logique d'ajout)
-    // addItemToCart({ id: 1, name: 'Produit Exemple', price: 29.99 });
+    // Fonction pour supprimer un article du panier
+    function removeItemFromCart(itemId) {
+      let cartItems = localStorage.getItem('cartItems');
+      try {
+        cartItems = cartItems ? JSON.parse(cartItems) : [];
+        if (!Array.isArray(cartItems)) {
+          cartItems = [];
+        }
+      } catch (e) {
+        cartItems = [];
+      }
+  
+      // Retirer l'article correspondant
+      cartItems = cartItems.filter(item => item.id !== itemId);
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    }
+  
+    // Appel à la mise à jour initiale lors du chargement de la page
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+    });
   </script>
 </body>
 </html>
