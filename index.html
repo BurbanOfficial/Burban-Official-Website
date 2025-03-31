@@ -82,7 +82,10 @@
         </nav>
         <div class="header-actions">
             <a class="sign-up" href="signup.html"><i class="fa-solid fa-user"></i></a>
-            <a class="sign-up" href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
+            <a class="sign-up cart-btn" href="cart.html">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-count">0</span>
+            </a>
         </div>
          <!-- Menu Burger -->
          <div class="burger-menu">
@@ -129,6 +132,7 @@
         </div>
         <div style="font-size: 14px; margin-bottom: 10px;">
             <a href="CGV.html" style="color: #fff; text-decoration: none; margin: 0 10px;" target="_blank">Terms and Conditions of Sale</a> |
+            <a href="cookies-policy.html" style="color: #fff; text-decoration: none; margin: 0 10px;" target="_blank">Cookie Policy</a> |
             <a href="contactform.html" style="color: #fff; text-decoration: none; margin: 0 10px;">Contact</a>
         </div>
         <div style="font-size: 14px;">
@@ -268,5 +272,60 @@
         }
     });
 </script>
+
+<script>
+    // Vérifie si 'cartItems' existe dans le localStorage, sinon l'initialise en tableau vide
+    function initCart() {
+      if (!localStorage.getItem('cartItems')) {
+        localStorage.setItem('cartItems', JSON.stringify([]));
+        console.log('Initialisation du panier : []');
+      }
+    }
+  
+    function updateCartCount() {
+      let cartItems = localStorage.getItem('cartItems');
+      
+      // Tentative de conversion en JSON et validation du type
+      try {
+        cartItems = cartItems ? JSON.parse(cartItems) : [];
+        if (!Array.isArray(cartItems)) {
+          console.warn('cartItems n\'est pas un tableau, réinitialisation.');
+          cartItems = [];
+        }
+      } catch (e) {
+        console.error('Erreur lors du parsing de cartItems, réinitialisation.', e);
+        cartItems = [];
+      }
+      
+      console.log('Nombre d\'articles dans le panier :', cartItems.length);
+      document.querySelector('.cart-count').textContent = cartItems.length;
+    }
+  
+    document.addEventListener('DOMContentLoaded', () => {
+      initCart();
+      updateCartCount();
+    });
+  
+    // Fonction d'ajout d'un article dans le panier
+    function addItemToCart(item) {
+      let cartItems = localStorage.getItem('cartItems');
+      try {
+        cartItems = cartItems ? JSON.parse(cartItems) : [];
+        if (!Array.isArray(cartItems)) {
+          cartItems = [];
+        }
+      } catch (e) {
+        cartItems = [];
+      }
+      
+      cartItems.push(item);
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+      updateCartCount();
+    }
+  
+    // Exemple d'utilisation (à adapter selon votre logique d'ajout)
+    // addItemToCart({ id: 1, name: 'Produit Exemple', price: 29.99 });
+  </script>  
+  
 </body>
 </html>
