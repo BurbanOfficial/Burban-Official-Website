@@ -1137,3 +1137,32 @@ footer {
         height: 400vh;
     }
 }
+
+/* Nombre d'articles au panier */
+.sign-up {
+    position: relative; /* Permet de positionner le badge par rapport à ce bouton */
+    display: inline-block;
+    font-size: 1rem;
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  .cart-count {
+    position: absolute;
+    font-family: 'Satoshi', sans-serif;
+    top: -10px;
+    right: -10px; /* Ajustez selon la taille de l'icône */
+    background-color: rgb(0, 0, 0);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    padding: 2px;
+    border: 2px solid white; /* Ajoute un contour blanc pour qu'il soit bien visible */
+  }
