@@ -117,7 +117,7 @@ function getCategory(item) {
   if (name.includes("coupe-vent") || name.includes("pyjama")) {
     return "category5";
   }
-  if (name.includes("casquette") || name.includes("cap") || name.includes("bonnet") || name.includes("beanie") || name.includes("bob") || name.includes("visière")) {
+  if (name.includes("casquette") || name.includes("cap") || name.includes("bonnet") || name.includes("Beanie") || name.includes("bob") || name.includes("visière")) {
     return "category6";
   }
   return "category3"; // Par défaut
@@ -233,3 +233,21 @@ app.post('/create-checkout-session', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
+
+// Code pour garder le serveur actif en se pinguant régulièrement
+const https = require('https'); // Utilisation du module https pour les requêtes sécurisées
+const SERVER_URL = 'https://burban-stripe-service.onrender.com'; // Remplacez par l'URL publique de votre app
+
+function pingSelf() {
+  https.get(SERVER_URL, (res) => {
+    console.log(`Ping effectué avec succès. Statut: ${res.statusCode}`);
+  }).on('error', (err) => {
+    console.error('Erreur lors du ping :', err.message);
+  });
+}
+
+// Ping toutes les 3 minutes (180000 millisecondes)
+setInterval(pingSelf, 180000);
+
+// Ping initial au démarrage
+pingSelf();
