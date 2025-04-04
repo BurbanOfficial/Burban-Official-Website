@@ -985,7 +985,7 @@ body {
   /* Contenu de la modale */
   .modal2-content {
     background: #fff;
-    border-radius: 8px;
+    border-radius: 18px;
     padding: 30px 20px;
     width: 90%;
     max-width: 400px;
@@ -1002,14 +1002,14 @@ body {
     margin: 0 10px;
     padding: 10px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     background-color: #000000;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
   .modal2-buttons button:hover {
-    background-color: #000000;
+    background-color: #000;
   }
   
   /* Animation d'apparition de la modale */
