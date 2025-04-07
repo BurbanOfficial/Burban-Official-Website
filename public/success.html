@@ -87,6 +87,11 @@
   </style>
 </head>
 <body>
+  <!-- Supprimer le panier stocké dans le localStorage -->
+  <script>
+    localStorage.removeItem('cartItems');
+  </script>
+
   <!-- Conteneur de l'animation placé un peu plus haut -->
   <div class="animation-container">
     <svg class="checkmark" viewBox="0 0 52 52">
@@ -98,24 +103,25 @@
   <h1>Thank you for your purchase!</h1>
   <p>Your order has been successfully processed.</p><br>
   <h6 id="countdown">You will be redirected in <span id="timer">5</span> seconds.</h6>
-</body>
-<script>
-  setTimeout(function() {
-    window.location.href = "https://burbanofficial.com"; // Remplace par l'URL de destination
-  }, 5000); // Temps en millisecondes (5000ms = 5s)
-</script>
-<script>
-  let countdown = 5; // Nombre de secondes avant la redirection
-  let timerElement = document.getElementById("timer");
 
-  function updateCountdown() {
-    countdown--;
-    timerElement.textContent = countdown;
-    if (countdown <= 0) {
+  <script>
+    setTimeout(function() {
       window.location.href = "https://burbanofficial.com"; // Remplace par l'URL de destination
-    }
-  }
+    }, 5000); // Temps en millisecondes (5000ms = 5s)
+  </script>
+  <script>
+    let countdown = 5; // Nombre de secondes avant la redirection
+    let timerElement = document.getElementById("timer");
 
-  setInterval(updateCountdown, 1000); // Met à jour toutes les secondes
-</script>
+    function updateCountdown() {
+      countdown--;
+      timerElement.textContent = countdown;
+      if (countdown <= 0) {
+        window.location.href = "https://burbanofficial.com"; // Remplace par l'URL de destination
+      }
+    }
+
+    setInterval(updateCountdown, 1000); // Met à jour toutes les secondes
+  </script>
+</body>
 </html>
