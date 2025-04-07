@@ -268,6 +268,8 @@ app.post('/create-checkout-session', async (req, res) => {
       });
     }
 
+    // Création de la session Checkout avec application de la TVA manuelle (20%)
+    // La variable d'environnement TAX_RATE_ID doit contenir l'identifiant de la taxe créée dans Stripe
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       billing_address_collection: 'required',
@@ -279,6 +281,8 @@ app.post('/create-checkout-session', async (req, res) => {
       line_items: lineItems,
       discounts: [],
       allow_promotion_codes: true,
+      // Application de la taxe manuelle (TVA 20%) sur l'ensemble du panier.
+      default_tax_rates: [process.env.TAX_RATE_ID],
       mode: 'payment',
       success_url: 'https://burbanofficial.com/public/success.html',
       cancel_url: 'https://burbanofficial.com/public/cancel.html'
