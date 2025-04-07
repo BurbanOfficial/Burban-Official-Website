@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -105,10 +104,10 @@ const shippingRates = {
  */
 function getCategory(item) {
   const name = item.name.toLowerCase();
-  if (name.includes("t-shirt") || name.includes("T-Shirt") || name.includes("débardeur") || name.includes("polo") || name.includes("crop-top")) {
+  if (name.includes("t-shirt") || name.includes("tshirt") || name.includes("débardeur") || name.includes("polo") || name.includes("crop-top")) {
     return "category1";
   }
-  if (name.includes("sweat") || name.includes("Crewneck Sweatshirt") || name.includes("pull") || name.includes("veste") || name.includes("pantalon de sport") || name.includes("pantalon de survêtement")) {
+  if (name.includes("sweat") || name.includes("crewneck sweatshirt") || name.includes("pull") || name.includes("veste") || name.includes("pantalon de sport") || name.includes("pantalon de survêtement")) {
     return "category2";
   }
   if (name.includes("hoodie") || name.includes("sweatshirt") || name.includes("jacket") || name.includes("pants") || name.includes("joggers")) {
@@ -117,7 +116,7 @@ function getCategory(item) {
   if (name.includes("coupe-vent") || name.includes("pyjama")) {
     return "category5";
   }
-  if (name.includes("casquette") || name.includes("cap") || name.includes("bonnet") || name.includes("Beanie") || name.includes("bob") || name.includes("visière")) {
+  if (name.includes("casquette") || name.includes("cap") || name.includes("bonnet") || name.includes("beanie") || name.includes("bob") || name.includes("visière")) {
     return "category6";
   }
   return "category3"; // Par défaut
@@ -125,18 +124,79 @@ function getCategory(item) {
 
 /**
  * Calcule le coût de livraison pour un article, en fonction de sa catégorie, de sa quantité et de la région.
+ * Méthode standard utilisée lorsque tous les articles appartiennent à la même catégorie.
  * @param {Object} item - L'article du panier (doit contenir name et quantity)
  * @param {string} region - La région de livraison (en minuscule)
  * @returns {number} Le coût en centimes.
  */
 function getShippingCost(item, region) {
   const category = getCategory(item);
-  // Utiliser les tarifs de la région spécifiée ou "worldwide" par défaut
   const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
   const uniqueCost = rates.unique;
   const additionalCost = rates.additional;
   const cost = uniqueCost + (item.quantity - 1) * additionalCost;
   return Math.round(cost * 100);
+}
+
+/**
+ * Calcule le coût total d'expédition pour une liste d'articles, en tenant compte
+ * des règles spécifiques pour les produits de catégories différentes.
+ * 
+ * Si tous les articles sont de la même catégorie, la formule habituelle est utilisée.
+ * Si plusieurs catégories sont présentes, le coût de livraison sera :
+ *    - Le tarif unique le plus élevé parmi les catégories pour un article.
+ *    - Le tarif supplémentaire de chaque catégorie pour les autres articles.
+ *
+ * @param {Array} items - Liste des articles du panier.
+ * @param {string} region - La région de livraison (en minuscule).
+ * @returns {number} Le coût total en centimes.
+ */
+function getCombinedShippingCost(items, region) {
+  // Regrouper les articles par catégorie et cumuler les quantités
+  const groups = {};
+  items.forEach(item => {
+    const category = getCategory(item);
+    if (!groups[category]) {
+      groups[category] = 0;
+    }
+    groups[category] += item.quantity;
+  });
+
+  const categories = Object.keys(groups);
+  let totalCost = 0;
+  
+  // Si tous les articles appartiennent à une seule catégorie, utiliser la méthode standard
+  if (categories.length === 1) {
+    const category = categories[0];
+    const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
+    totalCost = rates.unique + (groups[category] - 1) * rates.additional;
+  } else {
+    // Plusieurs catégories : déterminer le tarif unique le plus élevé
+    let maxUnique = 0;
+    let maxCategory = null;
+    categories.forEach(category => {
+      const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
+      if (rates.unique > maxUnique) {
+        maxUnique = rates.unique;
+        maxCategory = category;
+      }
+    });
+    // Pour la catégorie qui offre le tarif unique maximum, on compte un tarif unique
+    // et pour le reste de ses articles, le tarif additionnel
+    if (maxCategory) {
+      const rates = shippingRates[maxCategory][region] || shippingRates[maxCategory]["worldwide"];
+      totalCost += rates.unique + (groups[maxCategory] - 1) * rates.additional;
+    }
+    // Pour les autres catégories, on applique le tarif additionnel pour chacun des articles
+    categories.forEach(category => {
+      if (category !== maxCategory) {
+        const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
+        totalCost += groups[category] * rates.additional;
+      }
+    });
+  }
+  
+  return Math.round(totalCost * 100);
 }
 
 // Mapping des codes pays vers nos régions
@@ -193,7 +253,7 @@ app.post('/create-checkout-session', async (req, res) => {
     }));
 
     // Calcul global des frais de livraison pour tous les articles en fonction de la région détectée
-    const shippingTotal = items.reduce((total, item) => total + getShippingCost(item, region), 0);
+    const shippingTotal = getCombinedShippingCost(items, region);
 
     // Création du tableau des line_items à envoyer à Stripe
     let lineItems = productLineItems;
