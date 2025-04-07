@@ -36,32 +36,43 @@
       margin-bottom: 30px;
     }
     
-    /* Style du SVG pour l'animation de refus */
-    .cancelmark {
+    /* Style du SVG pour l'animation */
+    .arrowmark {
       width: 100px;
       height: 100px;
     }
     
     /* Cercle rouge qui se dessine */
-    .cancelmark__circle {
+    .arrowmark__circle {
       fill: none;
-      stroke: #f44336;
+      stroke: #f4c836;
       stroke-width: 2;
       stroke-dasharray: 166;
       stroke-dashoffset: 166;
       animation: drawCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
     }
     
-    /* Croix rouge qui se dessine (deux traits) */
-    .cancelmark__line {
+    /* Ligne horizontale de la flèche (de droite à gauche) */
+    .arrowmark__line {
       fill: none;
-      stroke: #f44336;
+      stroke: #f4c836;
       stroke-width: 2;
       stroke-linecap: round;
+      stroke-dasharray: 28;
+      stroke-dashoffset: 28;
+      animation: drawLine 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+    }
+    
+    /* Tête de la flèche (chevron) sans extra dot */
+    .arrowmark__arrowhead {
+      fill: none;
+      stroke: #f4c836;
+      stroke-width: 2;
+      stroke-linecap: butt; /* Modification ici pour éviter le point inutile */
       stroke-linejoin: round;
-      stroke-dasharray: 28.3;
-      stroke-dashoffset: 28.3;
-      animation: drawCross 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+      stroke-dasharray: 22.6;
+      stroke-dashoffset: 22.6;
+      animation: drawArrowHead 0.4s cubic-bezier(0.65, 0, 0.45, 1) 1.2s forwards;
     }
     
     @keyframes drawCircle {
@@ -70,7 +81,13 @@
       }
     }
     
-    @keyframes drawCross {
+    @keyframes drawLine {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    
+    @keyframes drawArrowHead {
       to {
         stroke-dashoffset: 0;
       }
@@ -86,39 +103,67 @@
       font-size: 1em;
       color: #666;
     }
+
+    @media (max-width: 600px) {
+  /* Réduction proportionnelle de la taille du conteneur d'animation */
+  .animation-container {
+    width: 90%;
+    margin: 0 auto 20px auto;
+  }
+  
+  /* Ajustement de la taille du SVG pour qu'il reste lisible sur petits écrans */
+  .arrowmark {
+    width: 80px;
+    height: 80px;
+  }
+  
+  /* Adaptation de la taille des titres et des paragraphes */
+  h1 {
+    font-size: 1.75em;
+  }
+  
+  p,
+  h6 {
+    font-size: 1em;
+  }
+}
   </style>
 </head>
 <body>
   <!-- Animation placée un peu plus haut sur la page -->
   <div class="animation-container">
-    <svg class="cancelmark" viewBox="0 0 52 52">
-      <circle class="cancelmark__circle" cx="26" cy="26" r="25" />
-      <path class="cancelmark__line" d="M16 16 L36 36" />
-      <path class="cancelmark__line" d="M36 16 L16 36" />
+    <svg class="arrowmark" viewBox="0 0 52 52">
+      <!-- Cercle extérieur -->
+      <circle class="arrowmark__circle" cx="26" cy="26" r="25" />
+      <!-- Ligne horizontale de la flèche -->
+      <path class="arrowmark__line" d="M40 26 L12 26" />
+      <!-- Chevrons formant la tête de la flèche -->
+      <path class="arrowmark__arrowhead" d="M20 18 L12 26 L20 34" />
     </svg>
   </div>
   
-  <h1>Payment canceled</h1>
+  <h1>Back to the shop</h1>
   <p>You have canceled your payment.</p><br>
-  <h6 id="countdown">You will be redirected in <span id="timer">5</span> seconds.</h6>
-</body>
-<script>
-  setTimeout(function() {
-    window.location.href = "https://burbanofficial.com"; // Remplace par l'URL de destination
-  }, 5000); // Temps en millisecondes (5000ms = 5s)
-</script>
-<script>
-  let countdown = 5; // Nombre de secondes avant la redirection
-  let timerElement = document.getElementById("timer");
+  <h6 id="countdown">You will be redirected in <span id="timer">3</span> seconds.</h6>
+  
+  <script>
+    setTimeout(function() {
+      window.location.href = "https://burbanofficial.com/cart.html"; // Remplace par l'URL de destination
+    }, 3000); // Temps en millisecondes (3000ms = 3s)
+  </script>
+  <script>
+    let countdown = 3; // Nombre de secondes avant la redirection
+    let timerElement = document.getElementById("timer");
 
-  function updateCountdown() {
-    countdown--;
-    timerElement.textContent = countdown;
-    if (countdown <= 0) {
-      window.location.href = "https://burbanofficial.com"; // Remplace par l'URL de destination
+    function updateCountdown() {
+      countdown--;
+      timerElement.textContent = countdown;
+      if (countdown <= 0) {
+        window.location.href = "https://burbanofficial.com/cart.html"; // Remplace par l'URL de destination
+      }
     }
-  }
 
-  setInterval(updateCountdown, 1000); // Met à jour toutes les secondes
-</script>
+    setInterval(updateCountdown, 1000); // Met à jour toutes les secondes
+  </script>
+</body>
 </html>
