@@ -1168,12 +1168,6 @@ footer {
   }
 
   /* Sélection de la langue */
-      /* Styles de base pour la fenêtre modale */
-      body {
-        margin: 0;
-        font-family: 'Satoshi', sans-serif;
-      }
-  
       /* Fond assombri derrière la modale */
       .modal-overlay {
         position: fixed;

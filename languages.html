@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sélection de la langue</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
+  <style>
+    /* Styles de base pour la fenêtre modale */
+    body {
+      margin: 0;
+      font-family: 'Satoshi', sans-serif;
+    }
+
+    /* Fond assombri derrière la modale */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+    }
+
+    /* Conteneur de la modale */
+    .modal {
+      background-color: #fff;
+      padding: 2em;
+      border-radius: 21px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      text-align: center;
+      z-index: 9999;
+    }
+
+    .modal h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      margin-bottom: 1.2em;
+    }
+
+    /* Conteneur pour les options de langue avec espace entre les boutons */
+    .language-options {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 1em;
+    }
+
+    /* Boutons de langue en flex column */
+    .lang-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f0f0f0;
+      border: 2.5px solid #ccc;
+      border-radius: 15px;
+      width: 120px;
+      padding: 1em;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    /* Pour les boutons non sélectionnés, centrer verticalement les contenus */
+    .lang-button:not(.selected) {
+      justify-content: center;
+    }
+
+    /* Pour le bouton sélectionné, laisser l'affichage par défaut et afficher le label de sélection */
+    .lang-button.selected {
+      border-color: #90bed6;
+      background-color: #90bdd694;
+      justify-content: flex-start;
+    }
+
+    .lang-button:hover {
+      background-color: #90bdd694;
+      border-color: #90bed6;
+    }
+
+    /* Arrondir les bords des images de drapeau */
+    .lang-button img {
+      width: 40px;
+      height: auto;
+      margin-bottom: 0.5em;
+      border-radius: 8px;
+    }
+
+    /* Style pour le texte indiquant la sélection */
+    .selected-label {
+      margin-top: 0.5em;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #000;
+      display: none;
+    }
+
+    .lang-button.selected .selected-label {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Contenu de la page -->
+<div id="page-content">
+  <!-- Votre contenu principal -->
+</div>
+
+<!-- Fenêtre modale (sera affichée uniquement si aucun choix n'est déjà sauvegardé) -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="languageModal">
+    <h2>Veuillez sélectionner votre langue</h2>
+    <div class="language-options">
+      <!-- Bouton pour Français -->
+      <div class="lang-button" id="frenchBtn">
+        <img src="https://flagcdn.com/h40/fr.png" alt="Drapeau Français">
+        <span>Français</span>
+        <span class="selected-label">Sélectionnée</span>
+      </div>
+
+      <!-- Bouton pour Anglais -->
+      <div class="lang-button" id="englishBtn">
+        <img src="https://flagcdn.com/h40/us.png" alt="Drapeau Américain">
+        <span>English</span>
+        <span class="selected-label">selected</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * Récupère la géolocalisation IP (pays) via ipapi.co
+ * Documentation : https://ipapi.co/json/
+ */
+function detectUserCountry() {
+  return fetch('https://ipapi.co/json/')
+    .then(response => response.json())
+    .then(data => {
+      if (data && data.country_code) {
+        return data.country_code;
+      } else {
+        throw new Error('Impossible de déterminer le code du pays.');
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      return null;
+    });
+}
+
+/**
+ * Redirections selon le choix de langue
+ */
+function redirectToFrench() {
+  window.location.href = 'https://burbanofficial.com/FR';
+}
+
+function redirectToEnglish() {
+  window.location.href = 'https://burbanofficial.com';
+}
+
+/**
+ * Pré-sélection selon le pays détecté :
+ * si le pays est la France, le bouton français est sélectionné,
+ * sinon le bouton anglais est sélectionné.
+ */
+function preselectLanguage(countryCode) {
+  const frenchBtn = document.getElementById('frenchBtn');
+  const englishBtn = document.getElementById('englishBtn');
+
+  if (countryCode === 'FR') {
+    frenchBtn.classList.add('selected');
+  } else {
+    englishBtn.classList.add('selected');
+  }
+}
+
+/**
+ * Met à jour le titre de la modale en fonction du pays détecté.
+ * Si l'utilisateur n'est pas Français, le titre sera en anglais.
+ */
+function updateModalTitle(countryCode) {
+  const modalTitle = document.querySelector("#languageModal h2");
+  if (countryCode && countryCode !== 'FR') {
+    modalTitle.textContent = "Please select your language";
+  }
+}
+
+/**
+ * Initialisation de la modale.
+ * Vérifie si un choix de langue est déjà sauvegardé dans localStorage.
+ * S'il existe, effectue la redirection immédiatement.
+ * Sinon, affiche la modale et sauvegarde le choix de l'utilisateur lors du clic.
+ */
+async function initModal() {
+  const storedLang = localStorage.getItem("selectedLanguage");
+  if (storedLang) {
+    if (storedLang === 'FR') {
+      redirectToFrench();
+    } else if (storedLang === 'EN') {
+      redirectToEnglish();
+    }
+    return; // Arrête l'initialisation si le choix est déjà fait
+  }
+
+  // Aucun choix sauvegardé, on affiche donc la modale
+  const countryCode = await detectUserCountry();
+  preselectLanguage(countryCode);
+  updateModalTitle(countryCode);
+
+  // Attache les événements qui sauvegardent le choix dans localStorage
+  document.getElementById('frenchBtn').addEventListener('click', function() {
+    localStorage.setItem("selectedLanguage", "FR");
+    redirectToFrench();
+  });
+  document.getElementById('englishBtn').addEventListener('click', function() {
+    localStorage.setItem("selectedLanguage", "EN");
+    redirectToEnglish();
+  });
+}
+
+// Initialiser au chargement de la page
+window.addEventListener('DOMContentLoaded', initModal);
+</script>
+
+</body>
+</html>
