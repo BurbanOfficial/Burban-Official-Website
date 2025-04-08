@@ -46,30 +46,6 @@
     </script>
 </head>
 <body>
-    <!-- Fenêtre modale de sélection de langue -->
-    <div class="modal-overlay" id="languageModalOverlay" style="display: none;">
-        <div class="modal" id="languageModal">
-        <h2 id="languageModalTitle">Veuillez sélectionner votre langue</h2>
-        <div class="language-options">
-            <!-- Bouton pour Français -->
-            <div class="lang-button" id="frenchBtn">
-            <img src="https://flagcdn.com/h40/fr.png" alt="Drapeau Français">
-            <span>Français</span>
-            <span class="selected-label">Sélectionnée</span>
-            </div>
-            <!-- Bouton pour Anglais -->
-            <div class="lang-button" id="englishBtn">
-            <img src="https://flagcdn.com/h40/us.png" alt="Drapeau Américain">
-            <span>English</span>
-            <span class="selected-label">selected</span>
-            </div>
-        </div>
-        </div>
-    </div>
-  
-  <!-- Bouton pour changer la langue ultérieurement -->
-  <button id="changeLanguageBtn" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">Change Language</button>
-
     <!-- Chatbot -->
     <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
     <script src="https://files.bpcontent.cloud/2024/12/07/16/20241207163925-NXZ0Q588.js"></script>
@@ -360,91 +336,6 @@
       updateCartCount();
     });
   </script>
-
-<script>
-    // Fonction pour récupérer la géolocalisation via ipapi.co et retourner le code pays
-    async function detectUserCountry() {
-      try {
-        const response = await fetch('https://ipapi.co/json/');
-        const data = await response.json();
-        return data && data.country_code ? data.country_code : null;
-      } catch (error) {
-        console.error(error);
-        return null;
-      }
-    }
-  
-    // Pré-sélectionne le bouton de langue en fonction du code pays détecté
-    function preselectLanguage(countryCode) {
-      const frenchBtn = document.getElementById('frenchBtn');
-      const englishBtn = document.getElementById('englishBtn');
-      if (countryCode === 'FR') {
-        frenchBtn.classList.add('selected');
-      } else {
-        englishBtn.classList.add('selected');
-      }
-    }
-  
-    // Met à jour le titre de la modale (anglais si le pays n'est pas FR)
-    function updateModalTitle(countryCode) {
-      const title = document.getElementById('languageModalTitle');
-      if (countryCode && countryCode !== 'FR') {
-        title.textContent = "Please select your language";
-      }
-    }
-  
-    // Redirige vers la version du site en fonction de la langue sélectionnée
-    function redirectToLanguage(lang) {
-      if (lang === 'FR') {
-        window.location.href = 'https://burbanofficial.com/FR';
-      } else if (lang === 'EN') {
-        window.location.href = 'https://burbanofficial.com';
-      }
-    }
-  
-    // Initialise la modale : si aucun choix n'a été fait, on affiche la modale,
-    // sinon on redirige automatiquement (sauf si on force l'affichage pour modifier le choix)
-    async function initLanguageModal(forceShow = false) {
-      const storedLang = localStorage.getItem('selectedLanguage');
-      if (storedLang && !forceShow) {
-        redirectToLanguage(storedLang);
-      } else {
-        // Affiche la modale
-        document.getElementById('languageModalOverlay').style.display = 'flex';
-        const countryCode = await detectUserCountry();
-        preselectLanguage(countryCode);
-        updateModalTitle(countryCode);
-      }
-    }
-  
-    // Gestion du clic sur le bouton Français
-    document.getElementById('frenchBtn').addEventListener('click', function() {
-      localStorage.setItem('selectedLanguage', 'FR');
-      document.getElementById('languageModalOverlay').style.display = 'none';
-      redirectToLanguage('FR');
-    });
-  
-    // Gestion du clic sur le bouton Anglais
-    document.getElementById('englishBtn').addEventListener('click', function() {
-      localStorage.setItem('selectedLanguage', 'EN');
-      document.getElementById('languageModalOverlay').style.display = 'none';
-      redirectToLanguage('EN');
-    });
-  
-    // Option pour changer la langue ultérieurement
-    document.getElementById('changeLanguageBtn').addEventListener('click', function() {
-      // Supprime le choix existant pour forcer la réaffichage de la modale
-      localStorage.removeItem('selectedLanguage');
-      // Affiche la modale sans redirection automatique
-      document.getElementById('languageModalOverlay').style.display = 'flex';
-    });
-  
-    // Initialisation lors du chargement de la page
-    window.addEventListener('DOMContentLoaded', function() {
-      initLanguageModal();
-    });
-  </script>
-  
   
 </body>
 </html>
