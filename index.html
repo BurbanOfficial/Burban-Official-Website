@@ -46,6 +46,27 @@
     </script>
 </head>
 <body>
+    <!-- Fenêtre modale de sélection de langue -->
+    <div class="modal-overlay" id="languageModalOverlay">
+        <div class="modal" id="languageModal">
+        <h2 id="languageModalTitle">Veuillez sélectionner votre langue</h2>
+        <div class="language-options">
+            <!-- Bouton pour Français -->
+            <div class="lang-button" id="frenchBtn">
+            <img src="https://flagcdn.com/h40/fr.png" alt="Drapeau Français">
+            <span>Français</span>
+            <span class="selected-label">Sélectionnée</span>
+            </div>
+            <!-- Bouton pour Anglais -->
+            <div class="lang-button" id="englishBtn">
+            <img src="https://flagcdn.com/h40/us.png" alt="Drapeau Américain">
+            <span>English</span>
+            <span class="selected-label">selected</span>
+            </div>
+        </div>
+        </div>
+    </div>
+
     <!-- Chatbot -->
     <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
     <script src="https://files.bpcontent.cloud/2024/12/07/16/20241207163925-NXZ0Q588.js"></script>
@@ -336,6 +357,53 @@
       updateCartCount();
     });
   </script>
+
+<script>
+    // Si vous avez déjà un fichier externe ou un module pour la sélection de langue, ce script ne modifie pas son fonctionnement.
+    // Il s'assure simplement que la modale apparaisse en overlay sur index.html.
+    
+    // Ici, nous utilisons directement votre logique existante.
+    // La modale s'affiche automatiquement lors du chargement de la page.
+    window.addEventListener('DOMContentLoaded', function() {
+      // Affiche la modale de sélection
+      document.getElementById('languageModalOverlay').style.display = 'flex';
+      
+      // Exemple : Si vous souhaitez ajouter la détection géolocale et la présélection, vous pouvez conserver votre fonction existante.
+      async function initLanguageSelection() {
+        try {
+          const response = await fetch('https://ipapi.co/json/');
+          const data = await response.json();
+          const countryCode = data && data.country_code ? data.country_code : null;
+          if (countryCode === 'FR') {
+            document.getElementById('frenchBtn').classList.add('selected');
+          } else {
+            document.getElementById('englishBtn').classList.add('selected');
+            // Option : modifiez le titre en anglais si besoin
+            document.getElementById('languageModalTitle').textContent = "Please select your language";
+          }
+        } catch (error) {
+          console.error("Erreur lors de la détection du pays :", error);
+        }
+      }
+      
+      initLanguageSelection();
+      
+      // Gestion des clics sur les boutons de langue (conservez votre logique de redirection/sauvegarde)
+      document.getElementById('frenchBtn').addEventListener('click', function() {
+        // Sauvegardez le choix si besoin (par exemple, dans le localStorage)
+        localStorage.setItem('selectedLanguage', 'FR');
+        // Ferme la modale ou redirige selon votre logique existante
+        document.getElementById('languageModalOverlay').style.display = 'none';
+        window.location.href = 'https://burbanofficial.com/FR';
+      });
+      document.getElementById('englishBtn').addEventListener('click', function() {
+        localStorage.setItem('selectedLanguage', 'EN');
+        document.getElementById('languageModalOverlay').style.display = 'none';
+        window.location.href = 'https://burbanofficial.com';
+      });
+    });
+  </script>
+  
   
 </body>
 </html>
