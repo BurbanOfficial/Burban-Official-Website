@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Burban - Gallery des nouveautés</title>
+  <!-- Lien vers le fichier CSS -->
+  <link rel="stylesheet" href="styles-gallery.css">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=bevellier@700,500,400&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="gallery-container">
+    <h1>Nos Dernières Nouveautés</h1>
+    <div class="gallery-grid">
+      <!-- Chaque élément de la galerie correspond à un article -->
+      <div class="gallery-item">
+        <a href="https://burbanofficial.com/public/urban-crest-ar00046.html" target="_blank">
+          <img src="https://i.imgur.com/U0oUcsA.jpeg" alt="Article 2">
+          <div class="overlay">Découvrer la casquette <strong>Urban Crest</strong></div>
+        </a>
+      </div>
+      <div class="gallery-item">
+        <a href="https://burbanofficial.com/public/celestial-b-ar00049.html" target="_blank">
+          <img src="https://i.imgur.com/rul03FX.jpeg" alt="Article 3">
+          <div class="overlay">Découvrez le T-Shirt <strong>Celestial B</strong></div>
+        </a>
+      </div>
+      <div class="gallery-item">
+        <a href="https://burbanofficial.com/public/urban-hibiscus-ar00044.html" target="_blank">
+          <img src="https://i.imgur.com/uVeTzOQ.jpeg" alt="Article 1">
+          <div class="overlay">Découvrez le sweat <strong>Urban Hibiscus</strong></div>
+        </a>
+      </div>
+      <!-- Ajoutez d'autres articles ici -->
+    </div>
+  </div>
+
+<script>
+// Exemple : Ajout d'un effet de log lors du clic sur un article
+    document.querySelectorAll('.gallery-item a').forEach(item => {
+    item.addEventListener('click', () => {
+        console.log("Article ouvert dans un nouvel onglet !");
+    });
+});
+</script>
+</body>
+</html>

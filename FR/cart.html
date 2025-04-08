@@ -52,12 +52,12 @@
 
     <div class="carousel-container">
         <div class="carousel-content">
-            <div class="carousel-item">Nouvelle collection disponible dès maintenant ! 🆕</div>
-            <div class="carousel-item">Restez informé ! Abonnez-vous au programme de fidélité Burban</div>
-            <div class="carousel-item">Livraison dans le monde entier 🌍</div>
-            <!-- <div class="carousel-item">The winter sales of 2025 end in&nbsp;<span id="countdown" class="countdown"></span></div> -->
-            <div class="carousel-item">Bienvenue ! 🫡</div>
-            <div class="carousel-item "><!-- hide-small (à mettre juste après "carousel-item" pour retirer sur petit écran) -->Burban s'engage pour la protection de l'environnement ! 🌍</div>
+          <div class="carousel-item">Nouvelle collection disponible dès maintenant ! 🆕</div>
+          <div class="carousel-item">Restez informé ! Abonnez-vous au programme de fidélité Burban</div>
+          <div class="carousel-item">Livraison dans le monde entier 🌍</div>
+          <!-- <div class="carousel-item">The winter sales of 2025 end in&nbsp;<span id="countdown" class="countdown"></span></div> -->
+          <div class="carousel-item">Bienvenue ! 🫡</div>
+          <div class="carousel-item hide-small">Burban s'engage pour la protection de l'environnement ! 🌍</div>
         </div>
         <button class="carousel-arrow arrow-left" onclick="prevSlide()" id="prevBtn">&#10094;</button>
         <button class="carousel-arrow arrow-right" onclick="nextSlide()" id="nextBtn">&#10095;</button>
@@ -72,7 +72,7 @@
             <div class="menu-container">
                 <ul class="menu">
                     <li>
-                        <li class="active"><a href="index.html">Accueil</a></li>
+                        <li><a href="index.html">Accueil</a></li>
                         <li><a href="shop-all.html">Boutique</a></li>
                         <!-- <li><a href="our-collections.html">Our Collections</a></li> -->
                         <li><a href="contactform.html">Contact</a></li>
@@ -83,10 +83,7 @@
         </nav>
         <div class="header-actions">
             <a class="sign-up" href="signup.html"><i class="fa-solid fa-user"></i></a>
-            <a class="sign-up cart-btn" href="cart.html">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="cart-count">0</span>
-            </a>
+            <a class="sign-up" href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
         </div>
          <!-- Menu Burger -->
          <div class="burger-menu">
@@ -104,11 +101,8 @@
         </div>
     </header>
 
-    <!--------------------- Section Bannières --------------------->
-    <object data="banners.html" type="text/html" class="main-banners"></object>
-
     <!--------------------- Section Galerie Photo --------------------->
-    <object data="gallery.html" type="text/html" class="main-gallery"></object>
+    <object data="https://burbanofficial.com/public/index.html" type="text/html" class="cart-stripe"></object>
 
     <!-- Section Bannière -->
     <div class="space-between"></div>
@@ -273,69 +267,5 @@
         }
     });
 </script>
-
-<script>
-    // Fonction pour récupérer et mettre à jour la quantité du panier
-    function updateCartCount() {
-      let cartItems = localStorage.getItem('cartItems');
-      
-      // Tentative de conversion en JSON et validation du type
-      try {
-        cartItems = cartItems ? JSON.parse(cartItems) : [];
-        if (!Array.isArray(cartItems)) {
-          console.warn('cartItems n\'est pas un tableau, réinitialisation.');
-          cartItems = [];
-        }
-      } catch (e) {
-        console.error('Erreur lors du parsing de cartItems, réinitialisation.', e);
-        cartItems = [];
-      }
-  
-      // Met à jour le badge
-      document.querySelector('.cart-count').textContent = cartItems.length;
-    }
-  
-    // Vérification et mise à jour du panier toutes les 500ms
-    setInterval(updateCartCount, 500);  // Cela vérifiera toutes les 500ms pour toute mise à jour
-  
-    // Fonction d'ajout d'un article dans le panier
-    function addItemToCart(item) {
-      let cartItems = localStorage.getItem('cartItems');
-      try {
-        cartItems = cartItems ? JSON.parse(cartItems) : [];
-        if (!Array.isArray(cartItems)) {
-          cartItems = [];
-        }
-      } catch (e) {
-        cartItems = [];
-      }
-  
-      cartItems.push(item);
-      localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    }
-  
-    // Fonction pour supprimer un article du panier
-    function removeItemFromCart(itemId) {
-      let cartItems = localStorage.getItem('cartItems');
-      try {
-        cartItems = cartItems ? JSON.parse(cartItems) : [];
-        if (!Array.isArray(cartItems)) {
-          cartItems = [];
-        }
-      } catch (e) {
-        cartItems = [];
-      }
-  
-      // Retirer l'article correspondant
-      cartItems = cartItems.filter(item => item.id !== itemId);
-      localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    }
-  
-    // Appel à la mise à jour initiale lors du chargement de la page
-    document.addEventListener('DOMContentLoaded', () => {
-      updateCartCount();
-    });
-  </script>
-  
 </body>
 </html>

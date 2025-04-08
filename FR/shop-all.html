@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Start cookieyes banner --> <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/21945fcacd4ddbe8724250f6/script.js"></script> <!-- End cookieyes banner -->
+     
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burban - Online Shop</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=bevellier@700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Favicon -->
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://i.imgur.com/CCC34mn.png">
+    <!-- Favicon pour les navigateurs modernes -->
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" sizes="16x16" />
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" sizes="32x32" />
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" sizes="48x48" />
+</head>
+<body>
+    <div class="carousel-container">
+        <div class="carousel-content">
+            <div class="carousel-item">Nouvelle collection disponible dès maintenant ! 🆕</div>
+            <div class="carousel-item">Restez informé ! Abonnez-vous au programme de fidélité Burban</div>
+            <div class="carousel-item">Livraison dans le monde entier 🌍</div>
+            <!-- <div class="carousel-item">The winter sales of 2025 end in&nbsp;<span id="countdown" class="countdown"></span></div> -->
+            <div class="carousel-item">Bienvenue ! 🫡</div>
+            <div class="carousel-item "><!-- hide-small (à mettre juste après "carousel-item" pour retirer sur petit écran) -->Burban s'engage pour la protection de l'environnement ! 🌍</div>
+        </div>
+        <button class="carousel-arrow arrow-left" onclick="prevSlide()" id="prevBtn">&#10094;</button>
+        <button class="carousel-arrow arrow-right" onclick="nextSlide()" id="nextBtn">&#10095;</button>
+    </div>
+    <header>
+        <div class="logo">
+            <a href="index.html">
+                <img src="https://i.imgur.com/1KGcrXV.png" alt="Company Logo">
+            </a>
+        </div>
+        <nav>
+            <div class="menu-container">
+                <ul class="menu">
+                    <li>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li class="active"><a href="shop-all.html">Boutique</a></li>
+                        <!-- <li><a href="our-collections.html">Our Collections</a></li> -->
+                        <li><a href="contactform.html">Contact</a></li>
+                        <li><a href="about-burban.html">A propos de Burban</a></li>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="header-actions">
+            <a class="sign-up" href="signup.html"><i class="fa-solid fa-user"></i></a>
+            <a class="sign-up cart-btn" href="cart.html">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-count">0</span>
+            </a>
+        </div>
+        <!-- Menu Burger -->
+        <div class="burger-menu">
+            <div class="burger-icon" onclick="toggleBurgerMenu()">
+                <i class="fa-solid fa-bars"></i> <!-- Icône menu hamburger -->
+                <i class="fa-solid fa-xmark"></i> <!-- Icône croix -->
+            </div>
+            <ul class="burger-dropdown">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="shop-all.html">Boutique</a></li>
+                <!-- <li><a href="our-collections.html">Our Collections</a></li> -->
+                <li><a href="contactform.html">Contact</a></li>
+                <li><a href="about-burban.html">A propos de Burban</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!------------------------------------------------------------------------------------------ Boutique ------------------------------------------------------------------------------------------>
+    <object data="all.html" type="text/html" class="online-shop"></object>
+        
+        <!------------------------------------------------------------------------------------------ Pied de page ------------------------------------------------------------------------------------------>
+        <!-- Section Bannière -->
+        <div class="space-between"></div>
+
+        <footer style="background-color: #000; color: #fff; padding: 40px 20px; text-align: center; font-family: 'Satoshi', sans-serif;">
+            <div style="margin-bottom: 20px;">
+                <a href="https://www.facebook.com/profile.php?id=61566473957609" target="_blank" style="color: #fff; margin: 0 10px; text-decoration: none;">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://www.tiktok.com/@burban.official" target="_blank" style="color: #fff; margin: 0 10px; text-decoration: none;">
+                    <i class="fab fa-tiktok"></i>
+                </a>
+                <a href="https://www.instagram.com/burban.official/" target="_blank" style="color: #fff; margin: 0 10px; text-decoration: none;">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.whatsapp.com/channel/0029VamoSXlDJ6GxgWLAmz17" target="_blank" style="color: #fff; margin: 0 10px; text-decoration: none;">
+                    <i class="fab fa-whatsapp"></i>
+                </a><br><br>
+                <!-- Le conteneur du sélecteur de langue -->
+                <div id="google_translate_element"></div>
+            </div>
+            <div style="font-size: 14px; margin-bottom: 10px;">
+                <a href="CGV.html" style="color: #fff; text-decoration: none; margin: 0 10px;" target="_blank">Conditions Générales de Vente</a> |
+                <a href="cookies-policy.html" style="color: #fff; text-decoration: none; margin: 0 10px;" target="_blank">Politique de Cookies</a> |
+                <a href="contactform.html" style="color: #fff; text-decoration: none; margin: 0 10px;">Contact</a>
+            </div>
+            <div style="font-size: 14px;">
+                &copy; 2024 - <span id="year"></span> Burban. Tous Droits Réservés.
+            </div>
+        </footer>
+        <script>
+            // Mise à jour automatique de l'année
+            document.getElementById('year').textContent = new Date().getFullYear();
+        </script>
+        <script>
+            const carouselContent = document.querySelector('.carousel-content');
+            const items = document.querySelectorAll('.carousel-item');
+            let index = 0;
+            let isTransitioning = false;
+
+            const firstItem = items[0].cloneNode(true);
+            carouselContent.appendChild(firstItem);
+
+            function nextSlide() {
+                if (isTransitioning) return;
+                isTransitioning = true;
+                index++;
+                updateCarousel();
+            }
+
+            function prevSlide() {
+                if (isTransitioning) return;
+                isTransitioning = true;
+                index--;
+                updateCarousel();
+            }
+
+            function updateCarousel() {
+                carouselContent.style.transition = 'transform 1s linear';
+                carouselContent.style.transform = `translateX(-${index * 100}%)`;
+
+                carouselContent.addEventListener('transitionend', () => {
+                    if (index === items.length) {
+                        carouselContent.style.transition = 'none';
+                        index = 0;
+                        carouselContent.style.transform = `translateX(0)`;
+                    } else if (index === -1) {
+                        carouselContent.style.transition = 'none';
+                        index = items.length - 2;
+                        carouselContent.style.transform = `translateX(-${index * 100}%)`;
+                    }
+                    isTransitioning = false;
+                }, { once: true });
+            }
+
+            let autoScroll = setInterval(nextSlide, 4000);
+
+            document.querySelector('.carousel-container').addEventListener('mouseenter', () => {
+                clearInterval(autoScroll);
+            });
+
+            document.querySelector('.carousel-container').addEventListener('mouseleave', () => {
+                autoScroll = setInterval(nextSlide, 4000);
+            });
+        </script>
+
+        <script>
+            function toggleBurgerMenu() {
+                const burgerIcon = document.querySelector('.burger-icon');
+                const burgerDropdown = document.querySelector('.burger-dropdown');
+                burgerIcon.classList.toggle('active');
+                burgerDropdown.classList.toggle('active');
+            }
+        </script>
+    </div>
+
+    <!-------------------------------------------------- Compte à rebours -------------------------------------------------->
+    <script>
+        // Set the date for the end of the winter sales (e.g., 31st January 2025 at 23:59:59)
+        var saleEndDate = new Date("Feb 04, 2025 23:59:59").getTime();
+
+        // Update the countdown every 1 second
+        var countdown = setInterval(function() {
+            var now = new Date().getTime();
+            var timeRemaining = saleEndDate - now;
+
+            // Calculate days, hours, minutes, and seconds
+            var days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+            // Display the result
+            document.getElementById("countdown").innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+
+            // If the countdown is over
+            if (timeRemaining < 0) {
+                clearInterval(countdown);
+                document.getElementById("countdown").innerHTML = "The sales have ended!";
+            }
+        }, 1000);
+    </script>
+
+<script>
+    // Sélectionner tous les liens du menu
+    const menuLinks = document.querySelectorAll('.menu a');
+    
+    // Récupérer l'URL actuelle
+    const currentUrl = window.location.href;
+    
+    // Ajouter la classe active au lien correspondant
+    menuLinks.forEach(link => {
+        if (link.href === currentUrl) {
+            link.parentElement.classList.add('active');
+        }
+    });
+</script>
+
+<script>
+    // Fonction pour récupérer et mettre à jour la quantité du panier
+    function updateCartCount() {
+      let cartItems = localStorage.getItem('cartItems');
+      
+      // Tentative de conversion en JSON et validation du type
+      try {
+        cartItems = cartItems ? JSON.parse(cartItems) : [];
+        if (!Array.isArray(cartItems)) {
+          console.warn('cartItems n\'est pas un tableau, réinitialisation.');
+          cartItems = [];
+        }
+      } catch (e) {
+        console.error('Erreur lors du parsing de cartItems, réinitialisation.', e);
+        cartItems = [];
+      }
+  
+      // Met à jour le badge
+      document.querySelector('.cart-count').textContent = cartItems.length;
+    }
+  
+    // Vérification et mise à jour du panier toutes les 500ms
+    setInterval(updateCartCount, 500);  // Cela vérifiera toutes les 500ms pour toute mise à jour
+  
+    // Fonction d'ajout d'un article dans le panier
+    function addItemToCart(item) {
+      let cartItems = localStorage.getItem('cartItems');
+      try {
+        cartItems = cartItems ? JSON.parse(cartItems) : [];
+        if (!Array.isArray(cartItems)) {
+          cartItems = [];
+        }
+      } catch (e) {
+        cartItems = [];
+      }
+  
+      cartItems.push(item);
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    }
+  
+    // Fonction pour supprimer un article du panier
+    function removeItemFromCart(itemId) {
+      let cartItems = localStorage.getItem('cartItems');
+      try {
+        cartItems = cartItems ? JSON.parse(cartItems) : [];
+        if (!Array.isArray(cartItems)) {
+          cartItems = [];
+        }
+      } catch (e) {
+        cartItems = [];
+      }
+  
+      // Retirer l'article correspondant
+      cartItems = cartItems.filter(item => item.id !== itemId);
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    }
+  
+    // Appel à la mise à jour initiale lors du chargement de la page
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+    });
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,100 @@
+/* Réinitialisation des marges et paddings */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Style général du body */
+body {
+  font-family: 'satoshi', sans-serif;
+  background-color: #fff;
+  color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Conteneur principal de la galerie */
+.gallery-container {
+  width: 90%;
+  max-width: 1200px;
+  padding: 20px;
+}
+
+/* Titre de la galerie */
+.gallery-container h1 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2.5em;
+  animation: fadeInDown 1s ease-out;
+}
+
+/* Grille de la galerie */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 20px;
+}
+
+/* Chaque item de la galerie */
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+/* Lien complet sur l'item */
+.gallery-item a {
+  display: block;
+  position: relative;
+}
+
+/* Style des images */
+.gallery-item img {
+  width: 100%;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+/* Overlay qui s'affiche au survol */
+.gallery-item .overlay {
+  position: absolute;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  width: 100%;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  font-size: 1.2em;
+}
+
+/* Effet au survol de l'item */
+.gallery-item:hover {
+  transform: translateY(-5px);
+}
+
+.gallery-item:hover img {
+  transform: scale(1.1);
+}
+
+.gallery-item:hover .overlay {
+  opacity: 1;
+}
+
+/* Animation pour le titre */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
