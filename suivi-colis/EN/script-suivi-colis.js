@@ -25,7 +25,7 @@ document.getElementById('track-btn').addEventListener('click', async function() 
   errorMessageEl.style.display = 'none';
   
   if (orderInput === '') {
-    displayError("Veuillez entrer un NUMÉRO DE COMMANDE.");
+    displayError("Please enter an ORDER NUMBER.");
     return;
   }
   
@@ -34,7 +34,7 @@ document.getElementById('track-btn').addEventListener('click', async function() 
     const querySnapshot = await ordersRef.where('orderNumber', '==', orderInput).get();
     
     if (querySnapshot.empty) {
-      displayError("Commande non trouvée. Veuillez vérifier le NUMÉRO.");
+      displayError("Order not found. Please check the NUMBER.");
       return;
     }
     
@@ -47,8 +47,8 @@ document.getElementById('track-btn').addEventListener('click', async function() 
     updateProgress(progressStep, orderData);
     
   } catch (error) {
-    console.error("Erreur lors de la récupération de la commande :", error);
-    displayError("Une erreur est survenue. Veuillez réessayer plus tard.");
+    console.error("Error retrieving the order:", error);
+    displayError("An error occurred. Please try again later.");
   }
 });
 

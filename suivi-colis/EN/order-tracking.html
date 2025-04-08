@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Suivi de Commande | Burban</title>
+  <title>Order Tracking | Burban</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- Google Fonts pour une typographie moderne -->
@@ -20,13 +20,13 @@
 <body>
   <div class="container">
     <header>
-      <h1>Suivi de Commande</h1>
-      <p class="subtitle">Entrez votre numéro de commande et vérifier son statut</p>
+      <h1>Order Tracking</h1>
+      <p class="subtitle">Enter your order number and check its status.</p>
     </header>
     
     <section class="tracking-input">
       <input type="text" id="order-input" placeholder="Order number" value="#">
-      <button id="track-btn">Suivre</button>
+      <button id="track-btn">Follow</button>
     </section>
     
     <section class="feedback">
@@ -38,27 +38,27 @@
       <div class="progress-bar">
         <div class="step" data-step="1">
           <div class="circle">1</div>
-          <p>Reçue</p>
+          <p>Received</p>
           <small class="step-date" id="step1-date"></small>
         </div>
         <div class="step" data-step="2">
           <div class="circle">2</div>
-          <p>Traitement</p>
+          <p>Processing</p>
           <small class="step-date" id="step2-date"></small>
         </div>
         <div class="step" data-step="3">
           <div class="circle">3</div>
-          <p>Expédiée</p>
+          <p>Shipped</p>
           <small class="step-date" id="step3-date"></small>
         </div>
         <div class="step" data-step="4">
           <div class="circle">4</div>
-          <p>En livraison</p>
+          <p>Out for delivery</p>
           <small class="step-date" id="step4-date"></small>
         </div>
         <div class="step" data-step="5">
           <div class="circle">5</div>
-          <p>Délivrée</p>
+          <p>Delivered</p>
           <small class="step-date" id="step5-date"></small>
         </div>
       </div>
@@ -66,12 +66,12 @@
     
     <!-- Champ Estimation de Livraison -->
     <section id="delivery-estimate-section" class="delivery-estimate-section" style="display: none;">
-      <h2>Estimation de livraison</h2>
+      <h2>Delivery estimate</h2>
       <p id="delivery-estimate"></p>
       <!-- Bouton vers le transporteur -->
       <div style="text-align: center; margin-top: 20px;">
         <button id="carrier-btn" style="display: none;" class="carrier-button">
-          Voir le suivi chez le transporteur
+          View tracking with the carrier
         </button>
       </div>
     </section>
