@@ -166,6 +166,33 @@
         document.getElementById('year').textContent = new Date().getFullYear();
     </script>
     <script>
+        // Vérifie si l'utilisateur a déjà choisi une langue
+        window.addEventListener('DOMContentLoaded', () => {
+            const languageModalOverlay = document.getElementById('languageModalOverlay');
+            const frenchBtn = document.getElementById('frenchBtn');
+            const englishBtn = document.getElementById('englishBtn');
+    
+            // Si la langue a déjà été choisie, on cache la modale
+            if (localStorage.getItem('languageChosen')) {
+                languageModalOverlay.style.display = 'none';
+            } else {
+                languageModalOverlay.style.display = 'flex'; // Affiche la modale
+            }
+    
+            // Lorsqu'une langue est sélectionnée
+            frenchBtn.addEventListener('click', () => {
+                localStorage.setItem('languageChosen', 'fr');
+                languageModalOverlay.style.display = 'none';
+            });
+    
+            englishBtn.addEventListener('click', () => {
+                localStorage.setItem('languageChosen', 'en');
+                languageModalOverlay.style.display = 'none';
+            });
+        });
+    </script>
+    
+    <script>
         const carouselContent = document.querySelector('.carousel-content');
         const items = document.querySelectorAll('.carousel-item');
         let index = 0;
@@ -402,40 +429,7 @@
         window.location.href = 'https://burbanofficial.com';
       });
     });
-  </script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const languageModal = document.getElementById("languageModalOverlay");
-        const frenchBtn = document.getElementById("frenchBtn");
-        const englishBtn = document.getElementById("englishBtn");
-
-        // Vérifie si une langue a déjà été choisie
-        const selectedLanguage = localStorage.getItem("selectedLanguage");
-
-        if (selectedLanguage) {
-            languageModal.style.display = "none";
-            // Tu peux ici rediriger ou changer dynamiquement la langue du site si besoin
-        } else {
-            languageModal.style.display = "flex";
-        }
-
-        frenchBtn.addEventListener("click", function () {
-            localStorage.setItem("selectedLanguage", "fr");
-            languageModal.style.display = "none";
-            // Redirige vers la version FR ou adapte le contenu
-            // window.location.href = '/fr/index.html'; (optionnel)
-        });
-
-        englishBtn.addEventListener("click", function () {
-            localStorage.setItem("selectedLanguage", "en");
-            languageModal.style.display = "none";
-            // Redirige vers la version EN ou adapte le contenu
-            // window.location.href = '/en/index.html'; (optionnel)
-        });
-    });
 </script>
-
-  
-  
+    
 </body>
 </html>
