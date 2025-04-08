@@ -403,6 +403,38 @@
       });
     });
   </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const languageModal = document.getElementById("languageModalOverlay");
+        const frenchBtn = document.getElementById("frenchBtn");
+        const englishBtn = document.getElementById("englishBtn");
+
+        // Vérifie si une langue a déjà été choisie
+        const selectedLanguage = localStorage.getItem("selectedLanguage");
+
+        if (selectedLanguage) {
+            languageModal.style.display = "none";
+            // Tu peux ici rediriger ou changer dynamiquement la langue du site si besoin
+        } else {
+            languageModal.style.display = "flex";
+        }
+
+        frenchBtn.addEventListener("click", function () {
+            localStorage.setItem("selectedLanguage", "fr");
+            languageModal.style.display = "none";
+            // Redirige vers la version FR ou adapte le contenu
+            // window.location.href = '/fr/index.html'; (optionnel)
+        });
+
+        englishBtn.addEventListener("click", function () {
+            localStorage.setItem("selectedLanguage", "en");
+            languageModal.style.display = "none";
+            // Redirige vers la version EN ou adapte le contenu
+            // window.location.href = '/en/index.html'; (optionnel)
+        });
+    });
+</script>
+
   
   
 </body>
