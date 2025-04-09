@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Cart</title>
+  <title>Mon Panier</title>
   <!-- Fonts et icônes -->
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -209,7 +209,7 @@
 </head>
 <body>
   <div class="cart-container">
-    <h1>My Cart</h1>
+    <h1>Mon Panier</h1>
     <div id="cart-items"></div>
     
     <!-- Affichage du total -->
@@ -217,15 +217,15 @@
     
     <!-- Section Bons de réduction / Message optionnel de connexion -->
     <div id="voucher-section">
-      <h3>Available discount coupons</h3>
+      <h3>Bons de réduction disponibles</h3>
       <div id="voucher-options">
-        <p>Loading...</p>
+        <p>Chargement...</p>
       </div>
     </div>
     
     <!-- Bouton de paiement -->
     <button id="checkout-btn" class="checkout-btn" onclick="handleCheckout()">
-      <span id="checkout-btn-text">Proceed to payment</span>
+      <span id="checkout-btn-text">Procéder au paiement</span>
       <div class="loader" id="loader" style="display:none;"></div>
       <span id="card-icon"><i class="fa-solid fa-credit-card"></i></span>
     </button>
