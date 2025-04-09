@@ -217,9 +217,9 @@
     
     <!-- Section Bons de réduction / Message optionnel de connexion -->
     <div id="voucher-section">
-      <h3>Bons de réduction disponibles</h3>
+      <h3>Available discount coupons</h3>
       <div id="voucher-options">
-        <p>Chargement...</p>
+        <p>Loading...</p>
       </div>
     </div>
     
@@ -332,7 +332,7 @@
         }
         return 0;
       } catch (error) {
-        console.error("Erreur lors de la récupération des points :", error);
+        console.error("Error while retrieving points:", error);
         return 0;
       }
     }
@@ -342,7 +342,7 @@
     function updateVoucherOptions() {
       const voucherOptionsDiv = document.getElementById('voucher-options');
       if (!auth.currentUser) {
-        voucherOptionsDiv.innerHTML = `<p style="font-style: italic; color: #a00;">Connectez-vous pour voir vos bons de réduction.</p>`;
+        voucherOptionsDiv.innerHTML = `<p style="font-style: italic; color: #a00;">Log in to view your discount coupons.</p>`;
       } else {
         getUserPoints().then(points => {
           const cartTotalText = document.getElementById('cart-total').innerText;
@@ -361,18 +361,18 @@
               if (cartTotal >= voucher.minPurchase) {
                 voucherHTML += `<div style="margin-bottom: 8px;">
                   <input type="checkbox" class="voucher-checkbox" id="voucher-${voucher.value}" value="${voucher.value}" data-points="${voucher.points}">
-                  <label for="voucher-${voucher.value}" style="cursor: pointer;">Bon de ${voucher.value}€ (coûte ${voucher.points} points)</label>
+                  <label for="voucher-${voucher.value}" style="cursor: pointer;">€${voucher.value} coupon (cost ${voucher.points} points)</label>
                 </div>`;
               } else {
                 voucherHTML += `<div style="margin-bottom: 8px; color: #aaa;">
-                  Bon de ${voucher.value}€ (min. d'achat ${voucher.minPurchase}€ - coûte ${voucher.points} points) <em>Non applicable</em>
+                  €${voucher.value} coupon (min. purchase €${voucher.minPurchase} - cost ${voucher.points} points) <em>Not applicable.</em>
                 </div>`;
               }
             }
           });
       
           if (voucherHTML === '') {
-            voucherHTML = `<p>Aucun bon de réduction disponible pour le moment.</p>`;
+            voucherHTML = `<p>No discount coupons available at the moment.</p>`;
           }
           voucherOptionsDiv.innerHTML = voucherHTML;
           addVoucherCheckboxListeners();
