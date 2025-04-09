@@ -164,13 +164,13 @@
           updateDoc(userRef, {
             points: updatedPoints
           }).then(() => {
-            console.log("Points mis à jour avec succès!");
+            console.log("Points successfully updated!");
           }).catch((error) => {
-            console.error("Erreur lors de la mise à jour des points:", error);
+            console.error("Error while updating points:", error);
           });
         }
       }).catch((error) => {
-        console.error("Erreur lors de la récupération des données utilisateur:", error);
+        console.error("Error while retrieving user data:", error);
       });
     }
 
