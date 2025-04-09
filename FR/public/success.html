@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment successful</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
+  <!-- Favicon -->
+  <link rel="icon" href="https://burbanofficial.com/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="https://burbanofficial.com/favicon.png">
+  <!-- Favicon pour les navigateurs modernes -->
+  <link rel="icon" href="https://burbanofficial.com/favicon.png" sizes="16x16" />
+  <link rel="icon" href="https://burbanofficial.com/favicon.png" sizes="32x32" />
+  <link rel="icon" href="https://burbanofficial.com/favicon.png" sizes="48x48" />
+  <style>
+    /* Réinitialisation basique */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #f8f8f8;
+      font-family: 'Satoshi', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      color: #333;
+    }
+    
+    /* Conteneur de l'animation positionné un peu au-dessus du centre */
+    .animation-container {
+      margin-bottom: 30px;
+    }
+    
+    /* Style du SVG de la checkmark */
+    .checkmark {
+      width: 100px;
+      height: 100px;
+    }
+    
+    .checkmark__circle {
+      fill: none;
+      stroke: #4CAF50;
+      stroke-width: 2;
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      animation: drawCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+    
+    .checkmark__check {
+      fill: none;
+      stroke: #4CAF50;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      animation: drawCheck 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+    }
+    
+    @keyframes drawCircle {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    
+    @keyframes drawCheck {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    
+    /* Styles des messages */
+    h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    
+    p {
+      font-size: 1em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <!-- Supprimer le panier stocké dans le localStorage -->
+  <script>
+    localStorage.removeItem('cartItems');
+  </script>
+
+  <!-- Conteneur de l'animation placé un peu plus haut -->
+  <div class="animation-container">
+    <svg class="checkmark" viewBox="0 0 52 52">
+      <circle class="checkmark__circle" cx="26" cy="26" r="25" />
+      <path class="checkmark__check" d="M14 27l10 10 15-15" />
+    </svg>
+  </div>
+  
+  <h1>Thank you for your purchase!</h1>
+  <p>Your order has been successfully processed.</p><br>
+  <h6 id="countdown">You will be redirected in <span id="timer">5</span> seconds.</h6>
+
+  <script>
+    setTimeout(function() {
+      window.location.href = "https://burbanofficial.com"; // Remplace par l'URL de destination
+    }, 5000); // Temps en millisecondes (5000ms = 5s)
+  </script>
+  <script>
+    let countdown = 5; // Nombre de secondes avant la redirection
+    let timerElement = document.getElementById("timer");
+
+    function updateCountdown() {
+      countdown--;
+      timerElement.textContent = countdown;
+      if (countdown <= 0) {
+        window.location.href = "https://burbanofficial.com"; // Remplace par l'URL de destination
+      }
+    }
+
+    setInterval(updateCountdown, 1000); // Met à jour toutes les secondes
+  </script>
+
+  <!-- Ajouter Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Configuration Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDb4AOtRT7jGENnLZ2KNwpczaG2Z77G2rc",
+      authDomain: "burban-fidelity.firebaseapp.com",
+      projectId: "burban-fidelity",
+      storageBucket: "burban-fidelity.firebasestorage.app",
+      messagingSenderId: "830299174800",
+      appId: "1:830299174800:web:f50a4ec419e108f7f16515",
+      measurementId: "G-E4QD4PYLM5"
+    };
+
+    // Initialiser Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Fonction pour soustraire les points du bon
+    function deductPoints(userId, pointsToDeduct) {
+      // Référence au document utilisateur
+      const userRef = doc(db, "users", userId); // "users" est la collection d'utilisateurs dans Firestore
+
+      getDoc(userRef).then((docSnap) => {
+        if (docSnap.exists()) {
+          // Récupérer les points actuels de l'utilisateur
+          const userData = docSnap.data();
+          let currentPoints = userData.points || 0;
+
+          // Soustraire les points
+          const updatedPoints = currentPoints - pointsToDeduct;
+
+          // Mettre à jour les points dans Firestore
+          updateDoc(userRef, {
+            points: updatedPoints
+          }).then(() => {
+            console.log("Points successfully updated!");
+          }).catch((error) => {
+            console.error("Error while updating points:", error);
+          });
+        }
+      }).catch((error) => {
+        console.error("Error while retrieving user data:", error);
+      });
+    }
+
+    // Vérifier si l'utilisateur est connecté
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userId = user.uid;
+
+        // Récupérer le montant du bon de réduction utilisé (par exemple 5€) depuis le localStorage
+        const discountAmount = parseFloat(localStorage.getItem('discountAmount')) || 0;
+
+        // Convertir le montant en points (ex: 5€ = 500 points)
+        const pointsToDeduct = discountAmount * 100;
+
+        // Soustraire les points de l'utilisateur sur Firebase
+        deductPoints(userId, pointsToDeduct);
+      }
+    });
+  </script>
+</body>
+</html>
