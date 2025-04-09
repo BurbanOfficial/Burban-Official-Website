@@ -294,8 +294,9 @@ app.post('/create-checkout-session', async (req, res) => {
         ],
       },
       line_items: lineItems,
-      discounts: discounts,
-      allow_promotion_codes: true,
+      // Si un voucher a été envoyé, on ajoute les discounts,
+      // sinon, on autorise l'utilisation de promotion_codes directement dans Stripe.
+      ...(discounts.length > 0 ? { discounts } : { allow_promotion_codes: true }),
       mode: 'payment',
       success_url: 'https://burbanofficial.com/public/success.html',
       cancel_url: 'https://burbanofficial.com/public/cancel.html'
