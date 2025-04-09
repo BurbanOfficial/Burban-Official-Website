@@ -100,9 +100,9 @@
     </svg>
   </div>
   
-  <h1>Thank you for your purchase!</h1>
-  <p>Your order has been successfully processed.</p><br>
-  <h6 id="countdown">You will be redirected in <span id="timer">5</span> seconds.</h6>
+  <h1>Merci pour votre achat !</h1>
+  <p>Votre commande a été traitée avec succès.</p><br>
+  <h6 id="countdown">Vous serez redirigé dans <span id="timer">5</span> secondes.</h6>
 
   <script>
     setTimeout(function() {
@@ -164,13 +164,13 @@
           updateDoc(userRef, {
             points: updatedPoints
           }).then(() => {
-            console.log("Points successfully updated!");
+            console.log("Points mis à jour avec succès!");
           }).catch((error) => {
-            console.error("Error while updating points:", error);
+            console.error("Erreur lors de la mise à jour des points:", error);
           });
         }
       }).catch((error) => {
-        console.error("Error while retrieving user data:", error);
+        console.error("Erreur lors de la récupération des données utilisateur:", error);
       });
     }
 
