@@ -123,5 +123,72 @@
 
     setInterval(updateCountdown, 1000); // Met à jour toutes les secondes
   </script>
+
+  <!-- Ajouter Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Configuration Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDb4AOtRT7jGENnLZ2KNwpczaG2Z77G2rc",
+      authDomain: "burban-fidelity.firebaseapp.com",
+      projectId: "burban-fidelity",
+      storageBucket: "burban-fidelity.firebasestorage.app",
+      messagingSenderId: "830299174800",
+      appId: "1:830299174800:web:f50a4ec419e108f7f16515",
+      measurementId: "G-E4QD4PYLM5"
+    };
+
+    // Initialiser Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Fonction pour soustraire les points du bon
+    function deductPoints(userId, pointsToDeduct) {
+      // Référence au document utilisateur
+      const userRef = doc(db, "users", userId); // "users" est la collection d'utilisateurs dans Firestore
+
+      getDoc(userRef).then((docSnap) => {
+        if (docSnap.exists()) {
+          // Récupérer les points actuels de l'utilisateur
+          const userData = docSnap.data();
+          let currentPoints = userData.points || 0;
+
+          // Soustraire les points
+          const updatedPoints = currentPoints - pointsToDeduct;
+
+          // Mettre à jour les points dans Firestore
+          updateDoc(userRef, {
+            points: updatedPoints
+          }).then(() => {
+            console.log("Points mis à jour avec succès!");
+          }).catch((error) => {
+            console.error("Erreur lors de la mise à jour des points:", error);
+          });
+        }
+      }).catch((error) => {
+        console.error("Erreur lors de la récupération des données utilisateur:", error);
+      });
+    }
+
+    // Vérifier si l'utilisateur est connecté
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userId = user.uid;
+
+        // Récupérer le montant du bon de réduction utilisé (par exemple 5€) depuis le localStorage
+        const discountAmount = parseFloat(localStorage.getItem('discountAmount')) || 0;
+
+        // Convertir le montant en points (ex: 5€ = 500 points)
+        const pointsToDeduct = discountAmount * 100;
+
+        // Soustraire les points de l'utilisateur sur Firebase
+        deductPoints(userId, pointsToDeduct);
+      }
+    });
+  </script>
 </body>
 </html>
