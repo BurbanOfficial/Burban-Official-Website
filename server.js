@@ -218,7 +218,7 @@ const euCountries = [
 
 app.post('/create-checkout-session', async (req, res) => {
   try {
-    const { items } = req.body;
+    const { items, voucher } = req.body;
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Aucun article dans le panier." });
     }
@@ -270,6 +270,20 @@ app.post('/create-checkout-session', async (req, res) => {
       });
     }
 
+    // Préparation des coupons (discounts) en fonction du voucher envoyé
+    let discounts = [];
+    if (voucher && voucher.voucherValue) {
+      if (voucher.voucherValue === "5") {
+        discounts.push({ coupon: process.env.COUPON_5 });
+      } else if (voucher.voucherValue === "10") {
+        discounts.push({ coupon: process.env.COUPON_10 });
+      } else if (voucher.voucherValue === "20") {
+        discounts.push({ coupon: process.env.COUPON_20 });
+      } else if (voucher.voucherValue === "30") {
+        discounts.push({ coupon: process.env.COUPON_30 });
+      }
+    }
+
     // Création de la session Checkout (sans default_tax_rates, les taxes sont appliquées par line_item)
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -280,8 +294,9 @@ app.post('/create-checkout-session', async (req, res) => {
         ],
       },
       line_items: lineItems,
-      discounts: [],
-      allow_promotion_codes: true,
+      // Si un voucher a été envoyé, on ajoute les discounts,
+      // sinon, on autorise l'utilisation de promotion_codes directement dans Stripe.
+      ...(discounts.length > 0 ? { discounts } : { allow_promotion_codes: true }),
       mode: 'payment',
       success_url: 'https://burbanofficial.com/public/success.html',
       cancel_url: 'https://burbanofficial.com/public/cancel.html'
