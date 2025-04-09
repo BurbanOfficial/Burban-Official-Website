@@ -215,3 +215,22 @@ header .subtitle {
   background-color: #333;
 }
 
+/* Style pour la section de provenance */
+.order-origin {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.origin-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0.5rem;
+}
+
+.flag-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;  /* Donne des bords arrondis */
+  object-fit: cover;   /* Pour conserver les proportions de l'image */
+}
