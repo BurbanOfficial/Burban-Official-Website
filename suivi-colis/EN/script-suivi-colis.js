@@ -485,7 +485,7 @@ function getCarrierTrackingUrl(carrier, trackingNumber) {
     case "chronopost":
       return `https://www.chronopost.fr/tracking-no/${trackingNumber}`;
     case "myorders":
-      return `https://myorders.co/fr/tracking/[${trackingNumber}]`;
+      return `https://myorders.co/fr/tracking/${trackingNumber}`;
     default:
       return null;
   }
