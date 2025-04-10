@@ -484,6 +484,8 @@ function getCarrierTrackingUrl(carrier, trackingNumber) {
       return `https://www.laposte.fr/outil/suivi-colissimo?code=${trackingNumber}`;
     case "chronopost":
       return `https://www.chronopost.fr/tracking-no/${trackingNumber}`;
+    case "myorders":
+      return `https://myorders.co/fr/tracking/[${trackingNumber}]`;
     default:
       return null;
   }
