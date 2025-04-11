@@ -356,28 +356,20 @@ function updateProgress(step, orderData) {
     deliveryEstimateElem.textContent = 'Non disponible';
   }
 
-  // Affichage du bouton de suivi transporteur uniquement si l'étape est exactement 4
+  // Affichage du bouton de suivi transporteur (étape 4 ou plus)
   const carrierBtn = document.getElementById('carrier-btn');
   const carrier = orderData.carrier || "";
   const trackingNumber = orderData.trackingNumber || "";
   const trackingUrl = getCarrierTrackingUrl(carrier, trackingNumber);
-  if (step === 4 && trackingUrl) {
+  if (step >= 4 && trackingUrl) {
     carrierBtn.style.display = "inline-block";
     carrierBtn.onclick = () => window.open(trackingUrl, "_blank");
   } else {
     carrierBtn.style.display = "none";
   }
   
-  // Affichage des origines
+  // Affichage des origines (potentiellement multiples, chacune alignée horizontalement)
   displayOrigin(orderData);
-
-  // Affichage du cadre d'assistance par email (visible uniquement à l'étape 5)
-  const supportEmailSection = document.getElementById('support-email');
-  if (step === 5) {
-    supportEmailSection.style.display = "block";
-  } else {
-    supportEmailSection.style.display = "none";
-  }
 }
 
 /**
