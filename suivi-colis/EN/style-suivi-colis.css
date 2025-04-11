@@ -97,7 +97,7 @@ header .subtitle {
 }
 
 .error-message.visible {
-  display: block; /* ou inline-block selon ton besoin */
+  display: block;
 }
 
 /* ========== Barre de progression ========== */
@@ -231,6 +231,6 @@ header .subtitle {
 .flag-icon {
   width: 40px;
   height: 40px;
-  border-radius: 50%;  /* Donne des bords arrondis */
-  object-fit: cover;   /* Pour conserver les proportions de l'image */
+  border-radius: 50%;
+  object-fit: cover;
 }

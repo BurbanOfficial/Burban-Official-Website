@@ -64,13 +64,17 @@
       </div>
     </section>
 
+    <!-- Nouveau cadre d'assistance (affiché uniquement à l'étape 5) -->
+    <section id="support-email" class="support-email" style="display: none; margin-top: 1rem; text-align: center;">
+      <p>Pour assistance, contactez : <strong>support@burban.com</strong></p>
+    </section>
+
     <!-- Section provenance de la commande -->
     <section id="order-origin" class="order-origin" style="display: none; margin-top: 1rem;">
-      <h2>Order Origin</h2>
+      <h2>Origin(s) of the order</h2>
       <div id="order-origin-container"></div>
     </section>
 
-    
     <!-- Champ Estimation de Livraison -->
     <section id="delivery-estimate-section" class="delivery-estimate-section" style="display: none;">
       <h2>Delivery estimate</h2>
@@ -85,15 +89,15 @@
   </div>
 
   <!-- Script pour éviter les doubles # -->
-<script>
-  const input = document.getElementById("order-input");
+  <script>
+    const input = document.getElementById("order-input");
 
-  input.addEventListener("input", () => {
-    // Supprime tous les # puis remet un seul au début
-    let raw = input.value.replace(/#/g, "");
-    input.value = "#" + raw;
-  });
-</script>
+    input.addEventListener("input", () => {
+      // Supprime tous les # puis remet un seul au début
+      let raw = input.value.replace(/#/g, "");
+      input.value = "#" + raw;
+    });
+  </script>
 
   <!-- Script principal -->
   <script src="script-suivi-colis.js"></script>
