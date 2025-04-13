@@ -1286,7 +1286,8 @@ footer {
         background-color: #333;
     }
 
-/* ==== Reset basique ==== */
+    /* Pour le bouton sélectionné, laisser l'affichage par défaut et afficher le label de sélection */
+    /* ==== Reset basique ==== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     /* ==== Style de l’écran de chargement ==== */
