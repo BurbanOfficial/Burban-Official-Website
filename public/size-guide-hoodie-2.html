@@ -116,10 +116,49 @@
         .hidden {
             display: none;
         }
+
+        /* ==== Reset basique ==== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ==== Style de l’écran de chargement ==== */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000; /* Fond noir */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease, visibility 0.6s;
+        }
+        .loader-container { display: flex; justify-content: center; align-items: center; }
+        .preloader-logo {
+            width: 80px;
+            height: auto;
+            filter: brightness(0) invert(1);
+            animation: fadeInOut 2s infinite;
+        }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        #preloader.hidden { opacity: 0; visibility: hidden; }
+        /* (Optionnel) style d'animation d'apparition pour le contenu principal */
+        .page-content { opacity: 0; transition: opacity 1s ease; }
+        body.loaded .page-content { opacity: 1; }
     </style>
 </head>
 <body>
-
+    <!-- Écran de chargement -->
+    <div id="preloader">
+        <div class="loader-container">
+        <img src="B.png" alt="Logo Burban" class="preloader-logo">
+        </div>
+    </div>
+    
     <div class="size-guide-container">
         <!-- Image et texte explicatif -->
         <div class="size-guide-header">
@@ -268,6 +307,14 @@
         tableCm.classList.add('hidden');
         btnInch.classList.add('selected');
         btnCm.classList.remove('selected');
+    });
+</script>
+<script>
+    // On attend que la page soit entièrement chargée
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      preloader.classList.add('hidden');
+      document.body.classList.add('loaded'); // si vous utilisez le fade du contenu
     });
 </script>
 
