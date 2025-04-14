@@ -46,6 +46,13 @@
     </script>
 </head>
 <body>
+    <!-- Écran de chargement -->
+    <div id="preloader">
+        <div class="loader-container">
+        <img src="https://i.imgur.com/2ITpYbQ.png" alt="Logo Burban" class="preloader-logo">
+        </div>
+    </div>
+
     <div class="carousel-container">
         <div class="carousel-content">
           <div class="carousel-item">Nouvelle collection disponible dès maintenant ! 🆕</div>
@@ -270,5 +277,14 @@
         }
     });
 </script>
+<script>
+    // On attend que la page soit entièrement chargée
+    window.addEventListener('load', function() {
+      const preloader = document.getElementById('preloader');
+      preloader.classList.add('hidden');
+      document.body.classList.add('loaded'); // si vous utilisez le fade du contenu
+    });
+  </script>
+  
 </body>
 </html>
