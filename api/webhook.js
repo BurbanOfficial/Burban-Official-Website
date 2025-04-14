@@ -20,7 +20,7 @@ exports.handler = async (event, context) => {
         },
         {
           headers: {
-            'api-key': 'VOTRE_API_KEY_BREVO',
+            'api-key': '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',
             'Content-Type': 'application/json'
           }
         }
