@@ -1017,4 +1017,18 @@ body {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  
+
+  /* Délais de livraison */
+    /* Style pour le petit drapeau avec bords arrondis */
+    .flag-icon {
+      border-radius: 4px;
+      width: 24px;
+      height: auto;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+    /* Style pour le bloc d'estimation de livraison */
+    #delivery-estimate {
+      margin: 4px 0;
+      font-family: 'Bevellier' , sans-serif;
+    }
