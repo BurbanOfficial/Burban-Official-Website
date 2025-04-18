@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Tracking | Burban</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Google Fonts pour une typographie moderne -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Inclusion des scripts Firebase (version compat pour simplifier l'exemple) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <!-- Feuille de style -->
+  <link rel="stylesheet" href="style-suivi-colis.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Order Tracking</h1>
+      <p class="subtitle">Enter your order number and check its status.</p>
+    </header>
+    
+    <section class="tracking-input">
+      <input type="text" id="order-input" placeholder="Order number" value="#">
+      <button id="track-btn">Follow</button>
+    </section>
+    
+    <section class="feedback">
+      <div id="error-message" class="error-message"></div>
+    </section>
+    
+    <!-- Conteneur de la barre de progression -->
+    <section id="tracking-progress-container" class="tracking-progress-container" style="display: none;">
+      <div class="progress-bar">
+        <div class="step" data-step="1">
+          <div class="circle">1</div>
+          <p>Received</p>
+          <small class="step-date" id="step1-date"></small>
+        </div>
+        <div class="step" data-step="2">
+          <div class="circle">2</div>
+          <p>Processing</p>
+          <small class="step-date" id="step2-date"></small>
+        </div>
+        <div class="step" data-step="3">
+          <div class="circle">3</div>
+          <p>Shipped</p>
+          <small class="step-date" id="step3-date"></small>
+        </div>
+        <div class="step" data-step="4">
+          <div class="circle">4</div>
+          <p>Out for delivery</p>
+          <small class="step-date" id="step4-date"></small>
+        </div>
+        <div class="step" data-step="5">
+          <div class="circle">5</div>
+          <p>Delivered</p>
+          <small class="step-date" id="step5-date"></small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section provenance de la commande -->
+    <section id="order-origin" class="order-origin" style="display: none; margin-top: 1rem;">
+      <h2>Origin(s) of the order</h2>
+      <div id="order-origin-container"></div>
+    </section>
+
+    
+    <!-- Champ Estimation de Livraison -->
+    <section id="delivery-estimate-section" class="delivery-estimate-section" style="display: none;">
+      <h2>Delivery estimate</h2>
+      <p id="delivery-estimate"></p>
+      <!-- Bouton vers le transporteur -->
+      <div style="text-align: center; margin-top: 20px;">
+        <button id="carrier-btn" style="display: none;" class="carrier-button">
+          View tracking with the carrier
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Script pour éviter les doubles # -->
+<script>
+  const input = document.getElementById("order-input");
+
+  input.addEventListener("input", () => {
+    // Supprime tous les # puis remet un seul au début
+    let raw = input.value.replace(/#/g, "");
+    input.value = "#" + raw;
+  });
+</script>
+
+  <!-- Script principal -->
+  <script src="script-suivi-colis.js"></script>
+</body>
+</html>
