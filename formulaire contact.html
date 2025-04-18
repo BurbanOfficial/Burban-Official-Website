@@ -159,7 +159,7 @@
 </head>
 <body>
   <div class="container">
-    <h2>Vous avez un problème ou une question ?<br>Nous sommes là pour vous aider !</h2>
+    <h2>Got a problem or a question?<br>We're here to help!</h2>
     <!-- Le formulaire envoie les données vers Formspree -->
     <form id="contactForm" action="https://formspree.io/f/mkgobldr" method="POST">
       <!-- Honeypot anti-spam (champ caché) -->
@@ -169,32 +169,32 @@
       </div>
       
       <!-- Adresse Email -->
-      <label for="email">Adresse Email<span class="required">*</span></label>
-      <input type="email" id="email" name="email" placeholder="Entrez votre adresse email ici" required>
+      <label for="email">Email Address<span class="required">*</span></label>
+      <input type="email" id="email" name="_replyto" placeholder="Your email address" required>
       
       <!-- Objet avec menu déroulant -->
-      <label for="subject">Objet<span class="required">*</span></label>
+      <label for="subject">Subject<span class="required">*</span></label>
       <select id="subject" name="subject" required>
-        <option value="">-- Sélectionnez un objet --</option>
-        <option value="commande">Suivi de commande</option>
-        <option value="retour">Demande de retour/remboursement</option>
-        <option value="taille">Question sur les tailles</option>
-        <option value="produit">Demande d'information sur un produit</option>
-        <option value="support">Support technique</option>
-        <option value="devis">Demande de devis (commande en gros)</option>
-        <option value="collaboration">Collaboration/Partenariat</option>
-        <option value="autre">Autre</option>
+        <option value="">-- Select a subject --</option>
+        <option value="commande">Order tracking</option>
+        <option value="retour">Return/refund request</option>
+        <option value="taille">Question about sizes</option>
+        <option value="produit">Product information request</option>
+        <option value="support">Technical support</option>
+        <option value="devis">Quote request (bulk order)</option>
+        <option value="collaboration">Collaboration/Partnership</option>
+        <option value="autre">Other</option>
       </select>
       
       <!-- Objet personnalisé (apparait si "Autre" est sélectionné) -->
       <div id="customSubjectContainer" class="hidden">
-        <label for="customSubject">Objet Personnalisé<span class="required">*</span></label>
-        <input type="text" id="customSubject" name="customSubject" placeholder="Entrez votre objet ici">
+        <label for="customSubject">Custom Subject<span class="required">*</span></label>
+        <input type="text" id="customSubject" name="customSubject" placeholder="Enter your subject">
       </div>
       
       <!-- Message -->
       <label for="message">Message<span class="required">*</span></label>
-      <textarea id="message" name="message" placeholder="Votre message" required></textarea>
+      <textarea id="message" name="message" placeholder="Your message" required></textarea>
       
       <!-- Bouton Envoyer avec effet survol -->
       <button type="submit">
@@ -204,9 +204,9 @@
     </form>
     <div id="error" class="error-message hidden"></div>
     <div id="confirmation" class="confirmation hidden">
-      Merci ! Votre message a bien été reçu.
+      Thank you! Your message has been successfully received.
     </div>
-    <p>Si vous rencontrez des problèmes pour envoyer votre message, n'hésitez pas à contacter directement notre équipe de support à l'adresse email suivante : <a href="mailto:support@burbanofficial.com">support@burbanofficial.com</a></p>
+    <p>If you're experiencing any issues sending your message, feel free to reach out directly to our support team at : <br><br><a href="mailto:support@burbanofficial.com">support@burbanofficial.com</a></p>
   </div>
   
   <script>
@@ -271,7 +271,7 @@
           customSubjectContainer.classList.add('hidden');
         } else {
           return response.json().then(data => {
-            throw new Error(data.errors ? data.errors.map(error => error.message).join(", ") : "Une erreur est survenue lors de l'envoi. Veuillez réessayer.");
+            throw new Error(data.errors ? data.errors.map(error => error.message).join(", ") : "An error occurred while sending. Please try again.");
           });
         }
       })
