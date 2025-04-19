@@ -734,6 +734,30 @@
 <!-- Affichage de tous les articles dans la page de découverte des articles dans la boutique -->
 <div class="shop-container">
     <div class="shop-container">
+        <div class="product-card" data-category="t-shirt" data-color="rose blanc lavande" data-price="20.99" onmouseover="showImage(this, 'https://i.imgur.com/ITx8c7r.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/ol3tK3L.jpeg')" onclick="openProductPageProduct23White()">
+            <!-- Étiquette respectueuse de l'environnement -->
+        <div class="eco-label">
+            <span class="eco-icon">🌱</span>
+        <!-- Bulle d'information (cachée par défaut) -->
+        <div class="eco-tooltip">
+            This product is environmentally friendly.
+        </div>
+        </div>
+            <img src="https://i.imgur.com/ol3tK3L.jpeg" alt="Produit 23" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">Metamorphosis</h3>
+                <h6 class="product-categorie">T-Shirt</h6>
+                <!-- Cercle de couleur personnalisé -->
+                <div class="color-circles">
+                    <div class="color-circle" style="background-color: #fff;"></div>
+                    <div class="color-circle" style="background-color: #ffe9eb;"></div>
+                    <div class="color-circle" style="background-color: #f7ecff;"></div>
+                </div>
+                <p class="product-price">20,99€</p>
+                <button class="view-product-button" onclick="openProductPageProduct23White(); event.stopPropagation();">Découvrir</button>
+            </div>
+        </div>
+
         <div class="product-card" data-category="t-shirt" data-color="rouge rose blanc" data-price="27.99" onmouseover="showImage(this, 'https://i.imgur.com/rul03FX.jpeg')" onmouseout="showImage(this, 'https://i.imgur.com/sfV3Vfw.jpeg')" onclick="openProductPageProduct22()">
             <!-- Étiquette respectueuse de l'environnement -->
         <div class="eco-label">
@@ -1523,6 +1547,11 @@ function openProductPageProduct21() {
 function openProductPageProduct22() {
     // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
     window.open('https://burbanofficial.com/public/celestial-b-ar00049.html', '_blank');
+}
+
+function openProductPageProduct23White() {
+    // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+    window.open('https://burbanofficial.com/FR/public/metamorphosis-ar00050.html', '_blank');
 }
 </script>
 
