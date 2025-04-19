@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burban | Metamorphosis - Rose Coton</title>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=bevellier@700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> <!-- Lien vers le fichier CSS -->
+    <script src="script.js" defer></script> <!-- Lien vers le fichier JavaScript -->
+    <!-- Favicon -->
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://i.imgur.com/CCC34mn.png">
+    <!-- Favicon pour les navigateurs modernes -->
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" sizes="16x16" />
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" sizes="32x32" />
+    <link rel="icon" href="https://i.imgur.com/CCC34mn.png" sizes="48x48" />
+</head>
+<body>
+
+<button id="closeButton" onclick="closeWindow()"><i class="fa-solid fa-circle-arrow-left"></i>&nbsp;&nbsp;Retourner à la boutique</button>
+
+<div class="container">
+    <div class="left">
+        <div class="gallery">
+            <img class="main-photo" src="https://i.imgur.com/HKaRX8P.jpeg" alt="Main Photo">
+            <div class="thumbnail-container">
+                <img class="thumbnail" src="https://i.imgur.com/0dnXLh4.jpeg" alt="Photo 1">
+                <img class="thumbnail" src="https://i.imgur.com/EeFiPqs.jpeg" alt="Photo 2">
+                <img class="thumbnail" src="https://i.imgur.com/PPUzMjA.jpeg" alt="Photo 3">
+            </div>
+            <div class="thumbnail-container1">
+                <img class="thumbnail" src="https://i.imgur.com/0xNMgLy.jpeg" alt="Photo 4">
+                <img class="thumbnail" src="https://i.imgur.com/YAIT1pC.jpeg" alt="Photo 5">
+                <img class="thumbnail" src="https://i.imgur.com/5FRXxl9.jpeg" alt="Photo 6">
+            </div>
+        </div>
+    </div>
+
+    <div id="carousel1" class="carousel">
+        <div class="carousel-images">
+          <img src="https://i.imgur.com/HKaRX8P.jpeg" alt="Image 1">
+          <img src="https://i.imgur.com/0dnXLh4.jpeg" alt="Image 2">
+          <img src="https://i.imgur.com/EeFiPqs.jpeg" alt="Image 3">
+          <img src="https://i.imgur.com/PPUzMjA.jpeg" alt="Image 4">
+          <img src="https://i.imgur.com/0xNMgLy.jpeg" alt="Image 5">
+          <img src="https://i.imgur.com/YAIT1pC.jpeg" alt="Image 6">
+          <img src="https://i.imgur.com/5FRXxl9.jpeg" alt="Image 7">
+        </div>
+        <div class="carousel-dots">
+          <span class="dot active" data-index="0"></span>
+          <span class="dot" data-index="1"></span>
+          <span class="dot" data-index="2"></span>
+          <span class="dot" data-index="3"></span>
+          <span class="dot" data-index="4"></span>
+          <span class="dot" data-index="5"></span>
+          <span class="dot" data-index="6"></span>
+        </div>
+    </div>
+      
+    <div class="right">
+        <h1><strong>Metamorphosis - T-Shirt (Rose Coton)</strong></h1>
+        <p class="price">€20,99</p>
+
+        <div id="product-info"
+            data-id="metamorphosis-rose-coton"
+            data-name="Metamorphosis - T-Shirt (Rose Coton)"
+            data-price="20.99"
+            data-image="https://i.imgur.com/HKaRX8P.jpeg">
+        </div>
+
+        <br><label for="color">Souhaitez-vous découvrir une autre couleurs ?</label>
+        <div class="similar-articles">
+            <div class="similar-articles-container">
+                <div class="product-card2" onclick="openProductPageProduct23Lavender()">
+                    <div class="product-info">
+                        <div class="color-option" data-color="#f7ecff" style="background-color: #f7ecff;"></div>
+                    </div>
+                </div>
+                <div class="product-card2" onclick="openProductPageProduct23White()">
+                    <div class="product-info">
+                        <div class="color-option" data-color="#fff" style="background-color: #fff;"></div>
+                    </div>
+                </div>
+                <!-- Ajoutez d'autres produits similaires ici -->
+            </div>
+        </div>
+
+        <br><label for="size">Sélectionnez votre taille</label>
+        <div class="size-selection">
+            <!-- <div class="size-option out-of-stock" onclick="indisponible()">Currently unavailable</div> -->
+            <div class="size-option" onclick="selectSize(this)">S</div>
+            <div class="size-option" onclick="selectSize(this)">M</div>
+            <div class="size-option" onclick="selectSize(this)">L</div>
+            <div class="size-option" onclick="selectSize(this)">XL</div>
+            <div class="size-option" onclick="selectSize(this)">2XL</div>
+            <div class="size-option out-of-stock" onclick="indisponible()">3XL</div>
+        </div>
+        <!-- Taille en rupture de stock exemple -->
+        <!-- <div class="size-option out-of-stock" onclick="indisponible()">M</div> -->
+        <button id="sizeGuideBtn" class="add-to-cart-button" onclick="openSizeGuideTShirt1()">Guide des tailles&nbsp;&nbsp;<i class="fa-solid fa-ruler"></i></button>
+        <button id="addToCartBtn" class="add-to-cart-button" style="display: true;" onclick="addToCart()">Ajouter au panier&nbsp;&nbsp;<i class="fa-solid fa-cart-plus"></i></button>
+        <p id="errorMessage" class="error-message">Veuillez sélectionner une taille.</p>
+
+        <div class="payment-carousel">
+            <div class="payment-list">
+                <img src="https://i.imgur.com/sb3suRq.png" alt="Card">
+                <img src="https://i.imgur.com/jryoqmV.png" alt="Apple Pay">
+                <img src="https://i.imgur.com/2h3gcxW.png" alt="Google Pay">
+                <img src="https://i.imgur.com/KH7uotH.png" alt="iDeal">
+                <img src="https://i.imgur.com/75oxo3K.png" alt="Revolut">
+                <img src="https://i.imgur.com/yMmP1GJ.png" alt="Klarna.">
+                <img src="https://i.imgur.com/4TqnhnQ.png" alt="Link">
+                <img src="https://i.imgur.com/RRkUHp9.jpeg" alt="EPS">
+                <img src="https://i.imgur.com/IAAtHmT.jpeg" alt="Blik">
+                <img src="https://i.imgur.com/X2vki8D.png" alt="Bancontact">
+                <!-- Ajoute d'autres icônes de paiement ici -->
+            </div>
+        </div>
+
+        <div class="free-shipping">
+            Retours gratuits sous 30 jours*
+        </div>
+
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-title" onclick="toggleAccordion('desc')">
+                    Description <span class="arrow"><i class="fas fa-chevron-up"></i></span>
+                </div>
+                <div class="accordion-content" id="desc">
+                    L’âme de Burban prend son envol avec Metamorphosis 🦋, un t-shirt où le papillon se faufile entre les lettres, symbole de transformation, de liberté et de force intérieure.<br><br>Pensé pour celles et ceux qui portent des histoires, Metamorphosis allie style brut, confort premium et engagement fort envers la durabilité. Confectionné à partir de 100 % de coton biologique peigné, il offre une texture douce et haut de gamme, agréable pour la peau — et respectueuse de la planète.<br><br>Avec sa coupe classique, son col côtelé solide et son motif dessiné à la main, ce t-shirt devient une pièce incontournable de ta garde-robe streetwear — audacieuse, minimaliste et porteuse de sens à la fois.
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-title" onclick="toggleAccordion('comp')">
+                    Composition, Qualité & Caractéristiques environnementales <span class="arrow"><i class="fas fa-chevron-up"></i></span>
+                </div>
+                <div class="accordion-content" id="comp">
+                    <li>100% Coton biologique 🌿</li>
+                    <li>Contient 0 % de substances dangereuses</li>
+                    <li>Impression DTG</li>
+                    <li>Coupe classique unisexe</li>
+                    <li>Pays d'origine : Bangladesh</li>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay pour afficher la photo en grand -->
+<div id="overlay" class="overlay" style="display:none;">
+    <div class="overlay-content">
+        <img id="overlay-photo" src="" alt="Photo Agrandie">
+        <span class="close-overlay" onclick="closePhoto()">×</span>
+    </div>
+</div>
+
+<!-- Fenêtre modale pour confirmation d'ajout au panier -->
+<div id="cartModal" class="modal2">
+    <div class="modal2-content">
+      <h2>Article ajouté au panier !</h2>
+      <p>Souhaitez-vous vous rendre à votre panier ?</p>
+      <div class="modal2-buttons">
+        <button id="viewCartBtn">Se rendre au panier</button><br><br>
+        <button id="continueBtn">Continuer les achats</button>
+      </div>
+    </div>
+</div>
+
+<script>
+    function openSizeGuideTShirt1() {
+        window.open('https://burbanofficial.com/FR/public/size-guide-t-shirt-4.html', '_blank');
+    }
+</script>
+
+<script>
+    function openProductPageProduct23White() {
+        // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+        window.location.href = 'https://burbanofficial.com/FR/public/metamorphosis-ar00050.html';
+    }
+    
+    function openProductPageProduct23Lavender() {
+        // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+        window.location.href = 'https://burbanofficial.com/FR/public/metamorphosis-ar00051.html';
+    }
+
+    function openProductPageProduct23CottonPink() {
+        // Ouvrir l'index.html dans le dossier Articles/Modèle dans un nouvel onglet
+        window.location.href = 'https://burbanofficial.com/FR/public/metamorphosis-ar00052.html';
+    }
+</script>
+</body>
+</html>
