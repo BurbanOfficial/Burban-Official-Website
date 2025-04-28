@@ -37,132 +37,183 @@
   
   <script src="https://js.stripe.com/v3/"></script>
   <style>
-    /* RESET & TYPO */
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Satoshi',sans-serif; background:#fafafa; color:#111; padding:20px; }
-    h1 { text-align:center; font-size:32px; margin-bottom:30px; font-weight:700; }
-
-    /* WRAPPER PRINCIPAL */
-    .cart-wrapper {
-      display:flex;
-      max-width:1200px;
-      margin:0 auto;
-      background:#fff;
-      padding:30px;
-      border-radius:16px;
-      box-shadow:0 8px 24px rgba(0,0,0,0.08);
-      gap:30px;
+    /* Styles généraux */
+    body {
+      font-family: 'Satoshi', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #fff;
+      color: #333;
     }
-
-    /* COLONNE ARTICLES */
-    .cart-items-container { flex:2; }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .cart-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
     .cart-item {
-      display:flex; align-items:center;
-      padding:20px 0; border-bottom:1px solid #eee;
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      transition: background 0.3s;
     }
-    .cart-item:last-child { border-bottom:none; }
+    .cart-item:hover {
+      background: #f0f0f0;
+    }
     .cart-item img {
-      width:70px; height:70px; object-fit:cover;
-      border-radius:10px; margin-right:20px;
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-right: 15px;
     }
     .item-details {
-      flex:1; display:flex; flex-direction:column;
+      flex: 1;
     }
-    .item-title { font-size:18px; font-weight:600; margin-bottom:5px; }
-    .item-price { font-size:16px; color:#666; }
+    .item-title {
+      font-size: 18px;
+      margin: 0 0 5px;
+    }
+    .item-price {
+      font-size: 16px;
+      color: #777;
+    }
     .quantity-controls {
-      display:flex; align-items:center; margin-top:10px;
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
     }
     .quantity-controls button {
-      background:none; border:1px solid #ccc;
-      padding:5px 10px; border-radius:8px;
-      font-size:16px; cursor:pointer;
-      transition:background 0.2s;
+      background: linear-gradient(145deg, #e6e6e6, #ffffff);
+      border: 1px solid #ccc;
+      padding: 5px 10px;
+      margin: 0 5px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      box-shadow: 3px 3px 6px #d1d1d1, -3px -3px 6px #ffffff;
     }
-    .quantity-controls button:hover { background:#f2f2f2; }
+    .quantity-controls button:hover {
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      box-shadow: 2px 2px 5px #c5c5c5, -2px -2px 5px #ffffff;
+    }
     .quantity-controls input {
-      width:50px; text-align:center;
-      margin:0 10px;
-      border:1px solid #ddd; border-radius:8px;
-      padding:5px 0;
+      width: 40px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .quantity-controls button:active {
+      background: #e0e0e0;
+      box-shadow: inset 2px 2px 5px #c5c5c5, inset -2px -2px 5px #ffffff;
     }
     .remove-button {
-      background:none; border:none;
-      color:#e63946; font-size:22px;
-      margin-left:15px; cursor:pointer;
-      transition:color 0.2s;
+      background: transparent;
+      border: none;
+      color: #e74c3c;
+      font-size: 24px;
+      cursor: pointer;
+      transition: color 0.3s;
     }
-    .remove-button:hover { color:#c92a2a; }
-
-    /* COLONNE RÉCAPITULATIF */
-    .cart-summary {
-      flex:1;
-      background:#f7f7f7; padding:20px;
-      border-radius:16px;
-      display:flex; flex-direction:column;
-      height:fit-content;
+    .remove-button:hover {
+      color: #c0392b;
     }
     .total {
-      font-size:24px; font-weight:700;
-      margin-bottom:20px; text-align:right; color:#111;
+      text-align: right;
+      font-size: 20px;
+      margin-top: 20px;
     }
-    #voucher-section { margin-bottom:20px; }
+    /* Section bons de réduction */
+    #voucher-section {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
     #voucher-section h3 {
-      font-size:20px; margin-bottom:10px; font-weight:600;
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: #333;
     }
     #voucher-section p,
-    #voucher-section label { font-size:16px; color:#555; }
-
+    #voucher-section label {
+      font-size: 16px;
+      color: #555;
+    }
+    /* Bouton de checkout */
     .checkout-btn {
-      display:flex; align-items:center; justify-content:center;
-      width:100%; padding:15px 0;
-      background:#111; color:#fff;
-      font-size:18px; font-weight:600;
-      border:none; border-radius:12px;
-      cursor:pointer; transition:background 0.3s;
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background: #000;
+      color: #fff;
+      text-align: center;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 20px;
+      position: relative;
     }
-    .checkout-btn:hover { background:#333; }
-    .checkout-btn:disabled { background:#888; cursor:not-allowed; }
-
+    .checkout-btn:hover {
+      background: #90bed6;
+    }
+    .checkout-btn:disabled {
+      background: #333;
+      cursor: not-allowed;
+    }
+    /* Loader (animation personnalisée) */
     .loader {
-      margin-left:10px; width:20px; height:20px;
-      border-radius:50%;
-      border:3px solid #fff; border-top:3px solid #111;
-      animation:spin 1s linear infinite;
-      display:none;
+      --ballcolor: #f2f2f2;
+      --shadow: 0px 0 #ffffff00;
+      --shadowcolor: #ffffff00;
+      width: 10px;
+      height: 10px;
+      left: -120px;
+      border-radius: 50%;
+      position: relative;
+      color: var(--ballcolor);
+      animation: shadowRolling 2s linear infinite;
+      vertical-align: middle;
+      margin: 0 5px;
     }
-    @keyframes spin {
-      0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);}
+    @keyframes shadowRolling {
+      0% { box-shadow: var(--shadow), var(--shadow), var(--shadow), var(--shadow); }
+      12% { box-shadow: 100px 0 var(--ballcolor), var(--shadow), var(--shadow), var(--shadow); }
+      25% { box-shadow: 110px 0 var(--ballcolor), 100px 0 var(--ballcolor), var(--shadow), var(--shadow); }
+      36% { box-shadow: 120px 0 var(--ballcolor), 110px 0 var(--ballcolor), 100px 0 var(--ballcolor), var(--shadow); }
+      50% { box-shadow: 130px 0 var(--ballcolor), 120px 0 var(--ballcolor), 110px 0 var(--ballcolor), 100px 0 var(--ballcolor); }
+      62% { box-shadow: 200px 0 var(--shadowcolor), 130px 0 var(--ballcolor), 120px 0 var(--ballcolor), 110px 0 var(--ballcolor); }
+      75% { box-shadow: 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor), 130px 0 var(--ballcolor), 120px 0 var(--ballcolor); }
+      87% { box-shadow: 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor), 130px 0 var(--ballcolor); }
+      100% { box-shadow: 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor); }
     }
-    #card-icon { margin-left:10px; font-size:20px; }
-
-    /* ÉTAT PANIER VIDE */
-    .empty-cart {
-      text-align:center; padding:60px 20px;
-    }
-    .empty-cart p {
-      font-size:20px; margin-bottom:20px; color:#555;
-    }
-    .empty-btn {
-      background:#111; color:#fff;
-      border:none; padding:12px 30px;
-      border-radius:30px;
-      font-size:16px; font-weight:600;
-      cursor:pointer; transition:background 0.3s;
-    }
-    .empty-btn:hover { background:#333; }
+    /* Styles pour la fenêtre modale de livraison */
+    .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); }
+    .modal-content { background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 50%; }
+    .close { float: right; font-size: 28px; cursor: pointer; }
   </style>
 </head>
 <body>
   <div class="cart-container">
     <h1>My Cart</h1>
-    <div class="cart-wrapper">
-    <!-- Colonne gauche : articles -->
-    <div class="cart-items-container" id="cart-items"></div>
+    <div id="cart-items"></div>
     
-    <!-- Colonne droite : résumé + paiement -->
-    <div class="cart-summary">
-      <div class="total">Total : <span id="cart-total">0.00€</span></div>
+    <!-- Affichage du total -->
+    <div class="total">Total : <span id="cart-total">0.00€</span></div>
     
     <!-- Section Bons de réduction / Message optionnel de connexion -->
     <div id="voucher-section">
@@ -180,44 +231,63 @@
     </button>
   </div>
 
-  <script>
-    function goShop() {
-      // change ici vers l’URL de ta boutique
-      window.location.href = 'https://burbanofficial.com';
-    }
+  <!-- Fenêtre modale pour l'adresse de livraison -->
+  <div id="shippingModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Adresse de Livraison</h2>
+      <form id="shippingForm">
+        <label for="fullName">Nom et Prénom :</label>
+        <input type="text" id="fullName" name="fullName" required>
 
+        <label for="address">Adresse :</label>
+        <input type="text" id="address" name="address" required>
+
+        <label for="city">Ville :</label>
+        <input type="text" id="city" name="city" required>
+
+        <label for="postalCode">Code Postal :</label>
+        <input type="text" id="postalCode" name="postalCode" required>
+
+        <label for="country">Pays :</label>
+        <select id="country" name="country" required>
+          <option value="us">États-Unis</option>
+          <option value="fr">France</option>
+          <option value="uk">Royaume-Uni</option>
+          <option value="ca">Canada</option>
+          <option value="de">Allemagne</option>
+          <option value="worldwide">Autre</option>
+        </select>
+
+        <button type="submit">Continuer vers le paiement</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
     // --- Chargement et gestion du panier ---
     function loadCart() {
-      const container = document.getElementById('cart-items');
-      const items = JSON.parse(localStorage.getItem('cartItems')) || [];
-      if (items.length === 0) {
-        container.innerHTML = `
-          <div class="empty-cart">
-            <p>Votre panier est vide.</p>
-            <button class="empty-btn" onclick="goShop()">Retourner à la boutique</button>
-          </div>`;
-        document.querySelector('.cart-summary').style.display = 'none';
-        return;
-      }
-      // sinon on affiche les articles
-      document.querySelector('.cart-summary').style.display = 'flex';
-      container.innerHTML = '';
-      items.forEach((item, i) => {
-        const el = document.createElement('div');
-        el.className = 'cart-item';
-        el.innerHTML = `
-          <img src="${item.image}" alt="${item.title}">
+      const cartItemsContainer = document.getElementById('cart-items');
+      const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+      cartItemsContainer.innerHTML = '';
+      cartItems.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'cart-item';
+        itemDiv.innerHTML = `
+          <img src="${item.image}" alt="${item.name}">
           <div class="item-details">
-            <span class="item-title">${item.title}</span>
-            <span class="item-price">${item.price.toFixed(2)}€</span>
+            <p class="item-title">${item.name}</p>
+            <p class="item-size">Size : ${item.size || 'N/A'}</p>
+            <p class="item-price">${item.price.toFixed(2)}€</p>
             <div class="quantity-controls">
-              <button onclick="changeQuantity(${i}, -1)">-</button>
-              <input type="text" value="${item.quantity}" readonly>
-              <button onclick="changeQuantity(${i}, 1)">+</button>
-              <button class="remove-button" onclick="removeItem(${i})"><i class="fas fa-times"></i></button>
+              <button onclick="updateQuantity(${index}, -1)">-</button>
+              <input type="number" value="${item.quantity}" min="1" max="10" onchange="changeQuantity(${index}, this.value)">
+              <button onclick="updateQuantity(${index}, 1)">+</button>
             </div>
-          </div>`;
-        container.appendChild(el);
+          </div>
+          <button class="remove-button" onclick="removeItem(${index})">&times;</button>
+        `;
+        cartItemsContainer.appendChild(itemDiv);
       });
       updateTotal();
     }
