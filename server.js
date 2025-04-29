@@ -1,420 +1,331 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BURBAN | Mon Panier</title>
+const express = require('express');
+const app = express();
+const path = require('path');
+const cors = require('cors');
+const geoip = require('geoip-lite');
+// La clé Stripe doit être définie dans Render via une variable d'environnement (STRIPE_SECRET_KEY)
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-  <!-- Fonts & Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-  <!-- Global CSS -->
-  <link rel="stylesheet" href="https://burbanofficial.github.io/Burban-Website/style.css" />
-  <!-- Cart-specific CSS -->
-  <link rel="stylesheet" href="https://burbanofficial.github.io/Burban-Website/public/cart.css" />
+// Route de test pour GeoIP (facultative)
+app.get('/geoip', (req, res) => {
+  const xForwardedFor = req.headers['x-forwarded-for'];
+  const ip = xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.connection.remoteAddress;
+  const geo = geoip.lookup(ip);
+  res.json({ ip, geo });
+});
 
-  <!-- Inline styles from Codage 1 -->
-  <style>
-    /* Quantity controls */
-    .quantity-controls {
-      display: flex;
-      align-items: center;
-      margin-top: 5px;
-    }
-    .quantity-controls button {
-      background: linear-gradient(145deg, #e6e6e6, #ffffff);
-      border: 1px solid #ccc;
-      padding: 5px 10px;
-      margin: 0 5px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 16px;
-      font-weight: bold;
-      color: #333;
-      box-shadow: 3px 3px 6px #d1d1d1, -3px -3px 6px #ffffff;
-    }
-    .quantity-controls button:hover {
-      background: linear-gradient(145deg, #ffffff, #f0f0f0);
-      box-shadow: 2px 2px 5px #c5c5c5, -2px -2px 5px #ffffff;
-    }
-    .quantity-controls input {
-      width: 40px;
-      text-align: center;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .quantity-controls button:active {
-      background: #e0e0e0;
-      box-shadow: inset 2px 2px 5px #c5c5c5, inset -2px -2px 5px #ffffff;
-    }
-    /* Remove button */
-    .remove-button {
-      background: transparent;
-      border: none;
-      color: #e74c3c;
-      font-size: 24px;
-      cursor: pointer;
-      transition: color 0.3s;
-    }
-    .remove-button:hover {
-      color: #c0392b;
-    }
-    /* Voucher section */
-    #voucher-section {
-      margin-top: 20px;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      background: #f9f9f9;
-    }
-    #voucher-section h3 {
-      margin: 0 0 10px;
-      font-size: 18px;
-      color: #333;
-    }
-    /* Loader animation */
-    .loader {
-      --ballcolor: #f2f2f2;
-      --shadow: 0px 0 #ffffff00;
-      --shadowcolor: #ffffff00;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      position: relative;
-      color: var(--ballcolor);
-      animation: shadowRolling 2s linear infinite;
-      vertical-align: middle;
-      margin: 0 5px;
-    }
-    @keyframes shadowRolling {
-      0% { box-shadow: var(--shadow), var(--shadow), var(--shadow), var(--shadow); }
-      12% { box-shadow: 100px 0 var(--ballcolor), var(--shadow), var(--shadow), var(--shadow); }
-      25% { box-shadow: 110px 0 var(--ballcolor), 100px 0 var(--ballcolor), var(--shadow), var(--shadow); }
-      36% { box-shadow: 120px 0 var(--ballcolor), 110px 0 var(--ballcolor), 100px 0 var(--ballcolor), var(--shadow); }
-      50% { box-shadow: 130px 0 var(--ballcolor), 120px 0 var(--ballcolor), 110px 0 var(--ballcolor), 100px 0 var(--ballcolor); }
-      62% { box-shadow: 200px 0 var(--shadowcolor), 130px 0 var(--ballcolor), 120px 0 var(--ballcolor), 110px 0 var(--ballcolor); }
-      75% { box-shadow: 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor), 130px 0 var(--ballcolor), 120px 0 var(--ballcolor); }
-      87% { box-shadow: 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor), 130px 0 var(--ballcolor); }
-      100% { box-shadow: 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor), 200px 0 var(--shadowcolor); }
-    }
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.4);
-    }
-    .modal-content {
-      background-color: #fff;
-      margin: 15% auto;
-      padding: 20px;
-      border-radius: 10px;
-      width: 50%;
-    }
-    .close {
-      float: right;
-      font-size: 28px;
-      cursor: pointer;
-    }
-  </style>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDb4AOtRT7jGENnLZ2KNwpczaG2Z77G2rc",
-      authDomain: "burban-fidelity.firebaseapp.com",
-      projectId: "burban-fidelity",
-      storageBucket: "burban-fidelity.firebasestorage.app",
-      messagingSenderId: "830299174800",
-      appId: "1:830299174800:web:f50a4ec419e108f7f16515",
-      measurementId: "G-E4QD4PYLM5"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-  </script>
-
-  <!-- Stripe JS -->
-  <script src="https://js.stripe.com/v3/"></script>
-</head>
-<body>
-
-  <!-- Header (Codage 2) -->
-  <header class="header">
-    <a href="index.html" class="logo-link">
-      <img src="https://i.imgur.com/Kl9kTBg.png" alt="Burban Logo" class="logo-img">
-    </a>
-    <nav class="nav">
-      <a href="index.html" class="nav-item">Accueil</a>
-      <a href="shop.html" class="nav-item">Shop</a>
-      <a href="about.html" class="nav-item">À propos</a>
-      <a href="contact.html" class="nav-item">Contact</a>
-    </nav>
-    <div class="actions">
-      <a href="account.html" class="account-btn" aria-label="Mon compte"><i class="fa-solid fa-user"></i></a>
-      <a href="cart.html" class="cart-btn" aria-label="Mon panier"><i class="fa-solid fa-bag-shopping"></i></a>
-      <button class="hamburger" aria-label="Ouvrir le menu">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </button>
-    </div>
-  </header>
-
-  <!-- Overlay menu mobile -->
-  <div class="overlay-menu" id="overlayMenu">
-    <button class="close-btn" aria-label="Fermer le menu">&times;</button>
-    <ul class="overlay-nav">
-      <li><a href="index.html">Accueil</a></li>
-      <li><a href="shop.html">Shop</a></li>
-      <li><a href="about.html">À propos</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    </ul>
-  </div>
-
-  <!-- Panier -->
-  <main class="cart-page">
-    <h1>Mon Panier</h1>
-
-    <div id="emptyMessage" class="empty-cart hidden">
-      <p>Votre panier est vide.</p>
-      <a href="shop.html" class="btn btn-back">Retour à la boutique</a>
-    </div>
-
-    <div id="cartContainer" class="cart-container">
-      <div id="cart-items" class="cart-items"></div>
-
-      <aside class="cart-summary">
-        <h2>Récapitulatif</h2>
-        <div class="summary-row">
-          <span>Sous-total</span><span id="subTotal">0€</span>
-        </div>
-        <div class="summary-row">
-          <span>Livraison</span><span id="shipping">A déterminer au paiement</span>
-        </div>
-        <div class="summary-row">
-          <span>TVA (20%)</span><span id="tax">0€</span>
-        </div>
-        <div class="summary-row total">
-          <span>Total</span><span id="total">0€</span>
-        </div>
-
-        <!-- Section Bons de réduction -->
-        <div id="voucher-section">
-          <h3>Coupons de réduction disponibles</h3>
-          <div id="voucher-options"><p>Chargement...</p></div>
-        </div>
-
-        <button id="checkout-btn" class="btn btn-add" onclick="handleCheckout()">
-          <span id="checkout-btn-text">Passer à la validation</span>
-          <div class="loader" id="loader" style="display:none;"></div>
-          <span id="card-icon"><i class="fa-solid fa-credit-card"></i></span>
-        </button>
-      </aside>
-    </div>
-  </main>
-
-  <!-- Modal Adresse de livraison -->
-  <div id="shippingModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Adresse de Livraison</h2>
-      <form id="shippingForm">
-        <label>Nom et Prénom :</label><input type="text" id="fullName" name="fullName" required>
-        <label>Adresse :</label><input type="text" id="address" name="address" required>
-        <label>Ville :</label><input type="text" id="city" name="city" required>
-        <label>Code Postal :</label><input type="text" id="postalCode" name="postalCode" required>
-        <label>Pays :</label>
-        <select id="country" name="country" required>
-          <option value="fr">France</option>
-          <option value="us">États-Unis</option>
-          <option value="uk">Royaume-Uni</option>
-          <option value="ca">Canada</option>
-          <option value="de">Allemagne</option>
-          <option value="worldwide">Autre</option>
-        </select>
-        <button type="submit">Continuer vers le paiement</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Footer (Codage 2) -->
-  <footer class="footer">
-    <div class="footer-container">
-      <div class="footer-brand">
-        <img src="https://i.imgur.com/Nup8sfC.png" alt="Burban Logo">
-        <p>Plus qu'une marque, une identité.</p>
-      </div>
-      <div class="footer-links">
-        <div>
-          <h4>Navigation</h4>
-          <a href="index.html">Accueil</a>
-          <a href="shop.html">Shop</a>
-          <a href="about.html">À propos</a>
-          <a href="contact.html">Contact</a>
-        </div>
-        <div>
-          <h4>Assistance</h4>
-          <a href="#">FAQ</a>
-          <a href="#">Livraison</a>
-          <a href="#">Retour</a>
-          <a href="#">CGV</a>
-        </div>
-        <div>
-          <h4>Suivez-nous</h4>
-          <a href="#">Instagram</a>
-          <a href="#">Facebook</a>
-          <a href="#">TikTok</a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      &copy; 2024 - <span id="year"></span> Burban. Tous Droits Réservés.
-    </div>
-  </footer>
-
-  <!-- Scripts -->
-  <script>
-    // --- Chargement et gestion du panier ---
-    function loadCart() {
-      const container = document.getElementById('cart-items');
-      const items = JSON.parse(localStorage.getItem('cartItems')) || [];
-      const summary = document.querySelector('.cart-summary');
-
-      // **On vide toujours le conteneur avant de réafficher ou masquer**
-      container.innerHTML = '';
-      updateTotal();
-
-      if (items.length === 0) {
-        document.getElementById('emptyMessage').classList.remove('hidden');
-        document.getElementById('cartContainer').classList.add('hidden');
-        summary.classList.add('hidden');
-        return;
-      }
-      document.getElementById('emptyMessage').classList.add('hidden');
-      document.getElementById('cartContainer').classList.remove('hidden');
-      summary.classList.remove('hidden');
-      container.innerHTML = '';
-      items.forEach((item, i) => {
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
-          <img src="${item.image}" alt="${item.name}">
-          <div class="item-details">
-            <p class="item-title">${item.name}</p>
-            <p class="item-size">Taille : ${item.size||'N/A'}</p>
-            <p class="item-price">${item.price.toFixed(2)}€</p>
-            <div class="quantity-controls">
-              <button onclick="updateQuantity(${i},-1)">-</button>
-              <input type="number" value="${item.quantity}" min="1" max="10" onchange="changeQuantity(${i},this.value)">
-              <button onclick="updateQuantity(${i},1)">+</button>
-            </div>
-          </div>
-          <button class="remove-button" onclick="removeItem(${i})">&times;</button>
-        `;
-        container.appendChild(div);
-      });
-      updateTotal();
-    }
-    function updateQuantity(i,delta){let items=JSON.parse(localStorage.getItem('cartItems'))||[];let q=items[i].quantity+delta;items[i].quantity=q<1?1:q>10?10:q;localStorage.setItem('cartItems',JSON.stringify(items));loadCart();}
-    function changeQuantity(i,val){let items=JSON.parse(localStorage.getItem('cartItems'))||[];let q=parseInt(val);items[i].quantity=q<1?1:q>10?10:q;localStorage.setItem('cartItems',JSON.stringify(items));loadCart();}
-    function removeItem(i){let items=JSON.parse(localStorage.getItem('cartItems'))||[];items.splice(i,1);localStorage.setItem('cartItems',JSON.stringify(items));loadCart();}
-
-    // --- Bons de réduction ---
-    async function getUserPoints(){try{const u=auth.currentUser;if(u){const d=await db.collection('users').doc(u.uid).get();return d.exists?d.data().points||0:0;}return 0;}catch(e){console.error(e);return 0;}}
-    function updateVoucherOptions(){const div=document.getElementById('voucher-options');if(!auth.currentUser){div.innerHTML=`<p style="font-style:italic;color:#a00;">Connectez-vous pour voir vos coupons.</p>`;return;}getUserPoints().then(points=>{const subt=document.getElementById('subTotal').innerText.replace('€','');const total=parseFloat(subt);const vouchers=[{points:500,value:5,min:30},{points:1000,value:10,min:40},{points:2000,value:20,min:80},{points:2500,value:30,min:100}];let html='';vouchers.forEach(v=>{if(points>=v.points){if(total>=v.min){html+=`<div style="margin-bottom:8px;"><input type="checkbox" class="voucher-checkbox" id="v${v.value}" value="${v.value}" data-points="${v.points}"><label for="v${v.value}" style="cursor:pointer;">€${v.value} coupon (coût ${v.points} pts)</label></div>`;}else{html+=`<div style="margin-bottom:8px;color:#aaa;">€${v.value} coupon (min. ${v.min}€ - coût ${v.points} pts) <em>Inapplicable</em></div>`;}}});if(!html) html='<p>Aucun coupon disponible.</p>';div.innerHTML=html;addVoucherCheckboxListeners();});}
-    function addVoucherCheckboxListeners(){const cbs=document.querySelectorAll('input.voucher-checkbox');cbs.forEach(cb=>cb.addEventListener('click',function(){if(this.checked){cbs.forEach(o=>o!==this&&(o.checked=false));}else this.checked=false;}));}
-
-    // --- Total & TVA ---
-    function updateTotal(){const items=JSON.parse(localStorage.getItem('cartItems'))||[];const sum=items.reduce((a,i)=>a+i.price*i.quantity,0);document.getElementById('subTotal').innerText=sum.toFixed(2)+'€';document.getElementById('tax').innerText=(sum*0.2).toFixed(2)+'€';document.getElementById('shipping').innerText='A déterminer au paiement';document.getElementById('total').innerText=(sum*1.2).toFixed(2)+'€';updateVoucherOptions();}
-    function resetButton(){const b=document.getElementById('checkout-btn');const t=document.getElementById('checkout-btn-text');const l=document.getElementById('loader');const c=document.getElementById('card-icon');b.disabled=false;t.style.display='inline';l.style.display='none';c.style.display='inline-block';}
-
-    // --- Checkout Stripe ---
-    async function handleCheckout(){const b=document.getElementById('checkout-btn'),t=document.getElementById('checkout-btn-text'),l=document.getElementById('loader'),c=document.getElementById('card-icon');b.disabled=true;t.style.display='none';l.style.display='inline-block';c.style.display='none';const sel=document.querySelector('input.voucher-checkbox:checked');let voucher=null;if(sel){voucher={value:sel.value,points:sel.getAttribute('data-points')};localStorage.setItem('appliedVoucher',JSON.stringify(voucher));}else localStorage.removeItem('appliedVoucher');try{const items=JSON.parse(localStorage.getItem('cartItems'))||[];if(!items.length){alert('Votre panier est vide !');resetButton();return;}const res=await fetch('https://burban-stripe-service.onrender.com/create-checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items,voucher})});const d=await res.json();if(d.error){alert(d.error);resetButton();return;}resetButton();const stripe=Stripe('pk_live_51Q9ORzRwel3656rYkt2acyiz7KoCl1mJA6ru04LPlGQmt5Iw9BcTQa16qv5O0Ozte9bMCtutah1qh4r6yds3l2p000MPG83KmB');stripe.redirectToCheckout({sessionId:d.sessionId});}catch(e){console.error(e);alert('Erreur, réessayez');resetButton();}}
-
-    // --- Auth & Init ---
-    auth.onAuthStateChanged(()=>updateVoucherOptions());
-    document.addEventListener('DOMContentLoaded',()=>{document.getElementById('loader').style.display='none';loadCart();
-      // Modal handlers
-      const modal=document.getElementById('shippingModal');const close=modal.querySelector('.close');close.onclick=()=>modal.style.display='none';window.onclick=e=>{if(e.target===modal)modal.style.display='none';};document.getElementById('shippingForm').addEventListener('submit',e=>{e.preventDefault();modal.style.display='none';handleCheckout();});
-      // Year
-      document.getElementById('year').innerText=new Date().getFullYear();
-    });
-  </script>
-
-<script>
-  // Shipping logic (copié du server)
-  const shippingRates = {
-    category1: { us:{unique:4.49, additional:2.10}, europe:{unique:4.29, additional:1.25}, /*...*/ worldwide:{unique:10.59, additional:5.30} },
-    /* autres catégories identiques à server.js */
-  };
-  const countryToRegion = { us:'us', ca:'canada', gb:'uk', uk:'uk', jp:'japan', au:'australia', br:'brazil' };
-  const euCountries = ['at','be','bg','cy','cz','dk','ee','fi','fr','de','gr','hr','hu','ie','it','lv','lt','lu','mt','nl','pl','pt','ro','sk','si','es','se'];
-
-  function getCategory(item) {
-    const name = item.name.toLowerCase();
-    if (name.includes('t-shirt')||name.includes('tshirt')||name.includes('débardeur')||name.includes('polo')||name.includes('crop-top')) return 'category1';
-    if (name.includes('sweat')||name.includes('pull')||name.includes('veste')||name.includes('pantalon')) return 'category2';
-    if (name.includes('hoodie')||name.includes('jacket')||name.includes('jogger')) return 'category4';
-    if (name.includes('coupe-vent')||name.includes('pyjama')) return 'category5';
-    if (name.includes('casquette')||name.includes('bonnet')||name.includes('bob')||name.includes('visière')) return 'category6';
-    return 'category3';
+/**
+ * Configuration des tarifs d'expédition par catégorie et par région.
+ * Les régions acceptées (en minuscule) : "us", "europe", "uk", "efta", "canada",
+ * "australia", "japan", "brazil" et "worldwide".
+ */
+const shippingRates = {
+  category1: { // T-shirts, débardeurs, T-shirts manches 3/4, t-shirts manches longues, polos, crop-tops
+    us:        { unique: 4.49, additional: 2.10 },
+    europe:    { unique: 4.29, additional: 1.25 },
+    uk:        { unique: 4.19, additional: 1.25 },
+    efta:      { unique: 8.99, additional: 1.00 },
+    canada:    { unique: 7.69, additional: 1.70 },
+    australia: { unique: 6.19, additional: 1.15 },
+    japan:     { unique: 3.99, additional: 1.25 },
+    brazil:    { unique: 4.09, additional: 2.25 },
+    worldwide: { unique: 10.59, additional: 5.30 }
+  },
+  category2: { // Sweats à capuche, sweats, pulls, vestes, pantalons de sport et de survêtement
+    us:        { unique: 8.09, additional: 2.20 },
+    europe:    { unique: 6.29, additional: 2.00 },
+    uk:        { unique: 5.99, additional: 2.00 },
+    efta:      { unique: 9.99, additional: 2.00 },
+    canada:    { unique: 9.49, additional: 2.05 },
+    australia: { unique: 9.79, additional: 1.80 },
+    japan:     { unique: 5.99, additional: 2.00 },
+    brazil:    { unique: 5.39, additional: 2.70 },
+    worldwide: { unique: 6.29, additional: 2.00 }
+  },
+  category3: { // Troisième grille tarifaire (par défaut)
+    us:        { unique: 9.79, additional: 4.90 },
+    europe:    { unique: 10.19, additional: 5.10 },
+    uk:        { unique: 9.79, additional: 4.90 },
+    efta:      { unique: 15.79, additional: 8.35 },
+    canada:    { unique: 9.79, additional: 4.90 },
+    australia: { unique: 9.79, additional: 4.90 },
+    japan:     { unique: 9.79, additional: 4.90 },
+    worldwide: { unique: 12.49, additional: 5.80 }
+  },
+  category4: { // Hoodies, sweatshirts, jackets, pants, joggers
+    us:        { unique: 7.09, additional: 2.20 },
+    europe:    { unique: 5.99, additional: 2.00 },
+    uk:        { unique: 5.99, additional: 2.00 },
+    efta:      { unique: 9.99, additional: 2.00 },
+    canada:    { unique: 8.19, additional: 2.05 },
+    australia: { unique: 9.79, additional: 1.80 },
+    japan:     { unique: 5.99, additional: 2.00 },
+    brazil:    { unique: 5.39, additional: 2.70 },
+    worldwide: { unique: 14.99, additional: 7.05 }
+  },
+  category5: { // Coupe-vent all over, pantalons de survêtement all over, pyjama all over
+    us:        { unique: 7.09, additional: 7.09 },
+    europe:    { unique: 7.99, additional: 7.99 },
+    uk:        { unique: 7.99, additional: 7.99 },
+    efta:      { unique: 7.99, additional: 7.99 },
+    canada:    { unique: 7.09, additional: 7.09 },
+    australia: { unique: 7.09, additional: 7.09 },
+    japan:     { unique: 7.09, additional: 7.09 },
+    worldwide: { unique: 7.99, additional: 7.99 }
+  },
+  category6: { // Casquettes, casquettes de baseball, casquettes snapback, casquettes en maille, bonnets, bobs, visières, bonnets all over
+    us:        { unique: 3.59, additional: 1.80 },
+    europe:    { unique: 3.99, additional: 1.25 },
+    uk:        { unique: 3.69, additional: 1.25 },
+    efta:      { unique: 8.99, additional: 1.00 },
+    canada:    { unique: 6.09, additional: 1.70 },
+    australia: { unique: 6.19, additional: 1.15 },
+    japan:     { unique: 3.99, additional: 1.25 },
+    brazil:    { unique: 4.09, additional: 2.25 },
+    worldwide: { unique: 10.59, additional: 5.30 }
   }
+};
 
-  function getCombinedShippingCost(items, region) {
-    const groups = {};
-    items.forEach(i=>{const cat=getCategory(i);groups[cat]=(groups[cat]||0)+i.quantity;});
-    const cats = Object.keys(groups);
-    if (cats.length===1) {
-      const rates = shippingRates[cats[0]][region]||shippingRates[cats[0]].worldwide;
-      return rates.unique + (groups[cats[0]]-1)*rates.additional;
+/**
+ * Détermine la catégorie d'un article en fonction de son nom.
+ *  - Catégorie 1 : t-shirt, tshirt, débardeur, polo, crop-top
+ *  - Catégorie 2 : sweat à capuche, pull, veste, pantalon de sport, pantalon de survêtement
+ *  - Catégorie 4 : hoodie, sweatshirt, jacket, pants, joggers
+ *  - Catégorie 5 : coupe-vent, pyjama
+ *  - Catégorie 6 : casquette, bonnet, bob, visière
+ *  - Par défaut : Catégorie 3
+ * 
+ * @param {Object} item - L'article (doit contenir au moins une propriété name)
+ * @returns {string} La clé de catégorie ("category1", "category2", etc.)
+ */
+function getCategory(item) {
+  const name = item.name.toLowerCase();
+  if (name.includes("t-shirt") || name.includes("tshirt") || name.includes("débardeur") || name.includes("polo") || name.includes("crop-top")) {
+    return "category1";
+  }
+  if (name.includes("sweat") || name.includes("crewneck sweatshirt") || name.includes("pull") || name.includes("veste") || name.includes("pantalon de sport") || name.includes("pantalon de survêtement")) {
+    return "category2";
+  }
+  if (name.includes("hoodie") || name.includes("sweatshirt") || name.includes("jacket") || name.includes("pants") || name.includes("joggers")) {
+    return "category4";
+  }
+  if (name.includes("coupe-vent") || name.includes("pyjama")) {
+    return "category5";
+  }
+  if (name.includes("casquette") || name.includes("cap") || name.includes("bonnet") || name.includes("beanie") || name.includes("bob") || name.includes("visière")) {
+    return "category6";
+  }
+  return "category3"; // Par défaut
+}
+
+/**
+ * Calcule le coût de livraison pour un article, en fonction de sa catégorie, de sa quantité et de la région.
+ * Méthode standard utilisée lorsque tous les articles appartiennent à la même catégorie.
+ * @param {Object} item - L'article du panier (doit contenir name et quantity)
+ * @param {string} region - La région de livraison (en minuscule)
+ * @returns {number} Le coût en centimes.
+ */
+function getShippingCost(item, region) {
+  const category = getCategory(item);
+  const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
+  const uniqueCost = rates.unique;
+  const additionalCost = rates.additional;
+  const cost = uniqueCost + (item.quantity - 1) * additionalCost;
+  return Math.round(cost * 100);
+}
+
+/**
+ * Calcule le coût total d'expédition pour une liste d'articles, en tenant compte
+ * des règles spécifiques pour les produits de catégories différentes.
+ * 
+ * Si tous les articles sont de la même catégorie, la formule habituelle est utilisée.
+ * Si plusieurs catégories sont présentes, le coût de livraison sera :
+ *    - Le tarif unique le plus élevé parmi les catégories pour un article.
+ *    - Le tarif supplémentaire de chaque catégorie pour les autres articles.
+ *
+ * @param {Array} items - Liste des articles du panier.
+ * @param {string} region - La région de livraison (en minuscule).
+ * @returns {number} Le coût total en centimes.
+ */
+function getCombinedShippingCost(items, region) {
+  // Regrouper les articles par catégorie et cumuler les quantités
+  const groups = {};
+  items.forEach(item => {
+    const category = getCategory(item);
+    if (!groups[category]) {
+      groups[category] = 0;
     }
-    let maxUnique=0, maxCat;
-    cats.forEach(c=>{const r=shippingRates[c][region]||shippingRates[c].worldwide;if(r.unique>maxUnique){maxUnique=r.unique;maxCat=c;}});
-    let total = maxUnique + (groups[maxCat]-1)*(shippingRates[maxCat][region]||shippingRates[maxCat].worldwide).additional;
-    cats.filter(c=>c!==maxCat).forEach(c=>{ const r=shippingRates[c][region]||shippingRates[c].worldwide; total += groups[c]*r.additional; });
-    return total;
-  }
-
-  async function detectRegion() {
-    // call geoip endpoint on your server
-    try {
-      const res = await fetch('/geoip');
-      const { geo } = await res.json();
-      const cc = geo && geo.country ? geo.country.toLowerCase() : null;
-      if (cc && countryToRegion[cc]) return countryToRegion[cc];
-      if (cc && euCountries.includes(cc)) return 'europe';
-    } catch(e){}
-    return 'worldwide';
-  }
-
-  async function updateTotal() {
-    const items = JSON.parse(localStorage.getItem('cartItems'))||[];
-    const sub = items.reduce((a,i)=>a+i.price*i.quantity,0);
-    const tax = sub*0.2;
-    const region = await detectRegion();
-    const shipping = getCombinedShippingCost(items, region);
-    document.getElementById('subTotal').innerText = sub.toFixed(2)+'€';
-    document.getElementById('shipping').innerText = shipping.toFixed(2)+'€';
-    document.getElementById('tax').innerText = tax.toFixed(2)+'€';
-    document.getElementById('total').innerText = (sub + tax + shipping).toFixed(2)+'€';
-    updateVoucherOptions();
-  }
-
-  // Load cart and bind remove/quantity logic as before, then call updateTotal()
-  document.addEventListener('DOMContentLoaded', ()=>{
-    loadCart();
+    groups[category] += item.quantity;
   });
-</script>
-</body>
-</html>
+
+  const categories = Object.keys(groups);
+  let totalCost = 0;
+  
+  // Si tous les articles appartiennent à une seule catégorie, utiliser la méthode standard
+  if (categories.length === 1) {
+    const category = categories[0];
+    const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
+    totalCost = rates.unique + (groups[category] - 1) * rates.additional;
+  } else {
+    // Plusieurs catégories : déterminer le tarif unique le plus élevé
+    let maxUnique = 0;
+    let maxCategory = null;
+    categories.forEach(category => {
+      const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
+      if (rates.unique > maxUnique) {
+        maxUnique = rates.unique;
+        maxCategory = category;
+      }
+    });
+    // Pour la catégorie qui offre le tarif unique maximum, on compte un tarif unique
+    // et pour le reste de ses articles, le tarif additionnel
+    if (maxCategory) {
+      const rates = shippingRates[maxCategory][region] || shippingRates[maxCategory]["worldwide"];
+      totalCost += rates.unique + (groups[maxCategory] - 1) * rates.additional;
+    }
+    // Pour les autres catégories, on applique le tarif additionnel pour chacun des articles
+    categories.forEach(category => {
+      if (category !== maxCategory) {
+        const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
+        totalCost += groups[category] * rates.additional;
+      }
+    });
+  }
+  
+  return Math.round(totalCost * 100);
+}
+
+// Mapping des codes pays vers nos régions
+const countryToRegion = {
+  us: 'us',
+  ca: 'canada',
+  gb: 'uk',
+  uk: 'uk',
+  jp: 'japan',
+  au: 'australia',
+  br: 'brazil'
+};
+
+// Liste de codes pays européens (en minuscule)
+const euCountries = [
+  'at','be','bg','cy','cz','dk','ee','fi','fr','de','gr','hr','hu',
+  'ie','it','lv','lt','lu','mt','nl','pl','pt','ro','sk','si','es','se'
+];
+
+app.post('/create-checkout-session', async (req, res) => {
+  try {
+    const { items, voucher } = req.body;
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: "Aucun article dans le panier." });
+    }
+    
+    // Détermination de la région de l'utilisateur via GeoIP
+    const xForwardedFor = req.headers['x-forwarded-for'];
+    const ip = xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.connection.remoteAddress;
+    const geo = geoip.lookup(ip);
+    let region = 'worldwide'; // Par défaut
+    if (geo && geo.country) {
+      const countryCode = geo.country.toLowerCase();
+      console.log("Détection GeoIP :", countryCode);
+      if (countryToRegion[countryCode]) {
+        region = countryToRegion[countryCode];
+      } else if (euCountries.includes(countryCode)) {
+        region = 'europe';
+      }
+    }
+    
+    // Création des line_items pour les produits avec application de la taxe
+    const productLineItems = items.map(item => ({
+      price_data: {
+        currency: 'eur',
+        product_data: {
+          name: item.name,
+          description: "Size : " + item.size,
+          images: [item.image],
+        },
+        unit_amount: Math.round(item.price * 100),
+      },
+      quantity: item.quantity,
+      tax_rates: [process.env.TAX_RATE_ID] // Application de la TVA à 20%
+    }));
+
+    // Calcul global des frais de livraison pour tous les articles en fonction de la région détectée
+    const shippingTotal = getCombinedShippingCost(items, region);
+
+    // Création du line_item pour les frais de livraison (si applicable) avec application de la taxe
+    let lineItems = productLineItems;
+    if (shippingTotal > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'eur',
+          product_data: { name: "Shipping Cost" },
+          unit_amount: shippingTotal,
+        },
+        quantity: 1,
+        tax_rates: [process.env.TAX_RATE_ID]
+      });
+    }
+
+    // Préparation des coupons (discounts) en fonction du voucher envoyé
+    let discounts = [];
+    if (voucher && voucher.voucherValue) {
+      if (voucher.voucherValue === "5") {
+        discounts.push({ coupon: process.env.COUPON_5 });
+      } else if (voucher.voucherValue === "10") {
+        discounts.push({ coupon: process.env.COUPON_10 });
+      } else if (voucher.voucherValue === "20") {
+        discounts.push({ coupon: process.env.COUPON_20 });
+      } else if (voucher.voucherValue === "30") {
+        discounts.push({ coupon: process.env.COUPON_30 });
+      }
+    }
+
+    // Création de la session Checkout (sans default_tax_rates, les taxes sont appliquées par line_item)
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      billing_address_collection: 'required',
+      shipping_address_collection: {
+        allowed_countries: [ 
+          'US','CA','AC','AD','AE','AG','AI','AL','AM','AO','AQ','AR','AT','AU','AW','AZ','BA','BB','BD','BE','BF','BG','BH','BI','BJ','BM','BN','BO','BR','BS','BV','BW','BZ','CD','CF','CG','CH','CI','CK','CL','CM','CN','CO','CR','CV','CW','CY','CZ','DE','DJ','DK','DM','DO','DZ','EE','EG','EH','ER','ES','ET','FI','FJ','FK','FO','FR','GA','GB','GD','GE','GF','GG','GH','GI','GL','GM','GN','GP','GQ','GR','GS','GT','GW','GY','HK','HN','HR','HT','HU','ID','IE','IL','IM','IN','IO','IQ','IS','IT','JE','JM','JO','JP','KE','KG','KH','KI','KM','KN','KR','KW','KY','KZ','LB','LC','LI','LK','LR','LS','LT','LU','LV','MA','MC','MD','ME','MF','MG','MK','ML','MM','MO','MQ','MR','MS','MT','MU','MV','MW','MX','MY','MZ','NA','NC','NE','NG','NI','NL','NO','NP','NR','NU','NZ','OM','PA','PE','PF','PG','PH','PK','PL','PM','PN','PS','PT','PY','QA','RE','RO','RS','RW','SA','SB','SC','SD','SE','SG','SH','SI','SJ','SK','SL','SM','SN','SO','SR','ST','SV','SZ','TA','TF','TG','TH','TK','TL','TN','TO','TR','TT','TV','TW','TZ','UA','UG','UY','UZ','VA','VC','VE','VG','VN','VU','WF','XK','YT','ZA','ZM','ZW','ZZ'
+        ],
+      },
+      line_items: lineItems,
+      // Si un voucher a été envoyé, on ajoute les discounts,
+      // sinon, on autorise l'utilisation de promotion_codes directement dans Stripe.
+      ...(discounts.length > 0 ? { discounts } : { allow_promotion_codes: true }),
+      mode: 'payment',
+      success_url: 'https://burbanofficial.com/public/success.html',
+      cancel_url: 'https://burbanofficial.com/public/cancel.html'
+    });
+    
+    res.json({ sessionId: session.id, url: session.url });
+  } catch (error) {
+    console.error("Erreur:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
+
+// Code pour garder le serveur actif en se pinguant régulièrement
+const https = require('https'); // Utilisation du module https pour les requêtes sécurisées
+const SERVER_URL = 'https://burban-stripe-service.onrender.com'; // Remplacez par l'URL publique de votre app
+
+function pingSelf() {
+  https.get(SERVER_URL, (res) => {
+    console.log(`Ping effectué avec succès. Statut: ${res.statusCode}`);
+  }).on('error', (err) => {
+    console.error('Erreur lors du ping :', err.message);
+  });
+}
+
+// Ping toutes les 3 minutes (180000 millisecondes)
+setInterval(pingSelf, 180000);
+
+// Ping initial au démarrage
+pingSelf();
