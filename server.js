@@ -287,15 +287,15 @@ app.post('/create-checkout-session', async (req, res) => {
     // Création de la session Checkout (sans default_tax_rates, les taxes sont appliquées par line_item)
     const session = await stripe.checkout.sessions.create({
       payment_method_types: [
-    'card',           // Cartes & Cartes bancaires (inclut Apple Pay & Google Pay si configurés)
-    'link',           // Link
-    'revolut',        // Revolut (beta)
-    'bancontact',     // Bancontact
-    'blik',           // Blik
-    'eps',            // EPS
-    'ideal',          // iDEAL
-    'afterpay_clearpay', // Billie (Afterpay / Clearpay)
-    'klarna'          // Klarna
+    'card',            // Cartes & Cartes bancaires (Apple Pay & Google Pay inclus si activés)
+    'link',            // Link
+    'revolut_pay',     // Revolut
+    'bancontact',      // Bancontact
+    'blik',            // Blik
+    'eps',             // EPS
+    'ideal',           // iDEAL
+    'billie',          // Billie
+    'klarna'           // Klarna
   ],
       billing_address_collection: 'required',
       shipping_address_collection: {
