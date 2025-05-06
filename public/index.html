@@ -413,79 +413,20 @@
 
     // --- Bons de réduction ---
     async function getUserPoints(){try{const u=auth.currentUser;if(u){const d=await db.collection('users').doc(u.uid).get();return d.exists?d.data().points||0:0;}return 0;}catch(e){console.error(e);return 0;}}
-    function updateVoucherOptions(){
-  const div = document.getElementById('voucher-options');
-  if(!auth.currentUser){
-    div.innerHTML = `<p style="font-style:italic;color:#a00;">
-                       Connectez-vous pour voir vos coupons.
-                     </p>`;
-    return;
-  }
-
-  const saved = localStorage.getItem('selectedVoucher');
-  getUserPoints().then(points => {
-    const subt  = parseFloat(document.getElementById('subTotal').innerText);
-    const vouchers = [
-      { points: 500,  value: 5,  min: 30 },
-      { points: 1000, value: 10, min: 40 },
-      { points: 2000, value: 20, min: 80 },
-      { points: 2500, value: 30, min: 100 },
-    ];
-
-    let html = '';
-    vouchers.forEach(v => {
-      if (points >= v.points) {
-        if (subt >= v.min) {
-          // coche si match avec saved
-          const isChecked = saved && Number(saved) === v.value;
-          html += `
-            <div style="margin-bottom:8px;">
-              <input
-                type="checkbox"
-                class="voucher-checkbox"
-                id="v${v.value}"
-                value="${v.value}"
-                data-points="${v.points}"
-                ${isChecked ? 'checked' : ''}
-              >
-              <label for="v${v.value}" style="cursor:pointer;">
-                €${v.value} coupon (coût ${v.points} pts)
-              </label>
-            </div>`;
-        } else {
-          html += `<div style="margin-bottom:8px;color:#aaa;">
-                     €${v.value} coupon (min. ${v.min}€ – coût ${v.points} pts)
-                     <em>Inapplicable</em>
-                   </div>`;
-        }
-      }
-    });
-
-    if (!html) html = '<p>Aucun coupon disponible.</p>';
-    div.innerHTML = html;
-    addVoucherCheckboxListeners();
-  });
-}
-
+    function updateVoucherOptions(){const div=document.getElementById('voucher-options');if(!auth.currentUser){div.innerHTML=`<p style="font-style:italic;color:#a00;">Connectez-vous pour voir vos coupons.</p>`;return;}getUserPoints().then(points=>{const subt=document.getElementById('subTotal').innerText.replace('€','');const total=parseFloat(subt);const vouchers=[{points:500,value:5,min:30},{points:1000,value:10,min:40},{points:2000,value:20,min:80},{points:2500,value:30,min:100}];let html='';vouchers.forEach(v=>{if(points>=v.points){if(total>=v.min){html+=`<div style="margin-bottom:8px;"><input type="checkbox" class="voucher-checkbox" id="v${v.value}" value="${v.value}" data-points="${v.points}"><label for="v${v.value}" style="cursor:pointer;">€${v.value} coupon (coût ${v.points} pts)</label></div>`;}else{html+=`<div style="margin-bottom:8px;color:#aaa;">€${v.value} coupon (min. ${v.min}€ - coût ${v.points} pts) <em>Inapplicable</em></div>`;}}});if(!html) html='<p>Aucun coupon disponible.</p>';div.innerHTML=html;addVoucherCheckboxListeners();});}
     
     function addVoucherCheckboxListeners(){
-    const cbs = document.querySelectorAll('input.voucher-checkbox');
-    cbs.forEach(cb => cb.addEventListener('click', function(){
-      if (this.checked){
-        // on décoche les autres
-        cbs.forEach(o => o !== this && (o.checked = false));
-        // on sauve le voucher sélectionné
-        localStorage.setItem('selectedVoucher', this.value);
-      } else {
-        // décoché -> on retire la sélection
-        localStorage.removeItem('selectedVoucher');
-        this.checked = false;
-      }
-      // recalcul complet
-      updateTotal();
-    }));
-  }
-
+      const cbs = document.querySelectorAll('input.voucher-checkbox');
+      cbs.forEach(cb => cb.addEventListener('click', function(){
+        if (this.checked){
+          cbs.forEach(o => o!==this && (o.checked = false));
+        } else {
+          this.checked = false;
+        }
+    +   // **nouveau** : rafraîchir immédiatement le calcul des points
+    +   updateLoyaltyPoints();
+      }));
+    }
 
     // --- Total & TVA ---
     function updateTotal(){const items=JSON.parse(localStorage.getItem('cartItems'))||[];const sum=items.reduce((a,i)=>a+i.price*i.quantity,0);document.getElementById('subTotal').innerText=sum.toFixed(2)+'€';document.getElementById('tax').innerText=(sum*0.2).toFixed(2)+'€';document.getElementById('shipping').innerText='A déterminer au paiement';document.getElementById('total').innerText=(sum*1.2).toFixed(2)+'€';updateVoucherOptions();}
@@ -658,42 +599,40 @@
 async function updateTotal() {
   const items   = JSON.parse(localStorage.getItem('cartItems')) || [];
   const sub     = items.reduce((a,i) => a + i.price * i.quantity, 0);
-
-  // frais de port
   const region   = await detectRegion();
   const shipping = getCombinedShippingCost(items, region);
 
-  // montant du coupon coché
+  // **nouvelle** lecture du discount
   const sel      = document.querySelector('input.voucher-checkbox:checked');
   const discount = sel ? Number(sel.value) : 0;
 
-  // préparation des nouveaux calculs
-  const base    = Math.max(0, sub + shipping - discount);
-  const tax     = base * 0.2;
-  const total   = base + tax;
+  // ancienne base et totaux
+  const oldBase  = sub + shipping;
+  const oldTax   = oldBase * 0.2;
+  const oldTotal = oldBase + oldTax;
 
-  // mise à jour des lignes
+  // nouvelle base et totaux
+  const newBase  = Math.max(0, oldBase - discount);
+  const newTax   = newBase * 0.2;
+  const newTotal = newBase + newTax;
+
+  // affichage
   document.getElementById('subTotal').innerText = sub.toFixed(2) + '€';
   document.getElementById('shipping').innerText = shipping.toFixed(2) + '€';
-  document.getElementById('tax').innerText      = tax.toFixed(2) + '€';
+  document.getElementById('tax').innerText      = newTax.toFixed(2) + '€';
 
-  // afficher / masquer la ligne Réduction vs Points
-  const discRow = document.getElementById('discount-row');
-  const ptsRow  = document.getElementById('loyalty-points-row');
-
+  const totalEl = document.getElementById('total');
   if (discount > 0) {
-    discRow.style.display = 'flex';
-    document.getElementById('discount-amount').innerText = `-${discount.toFixed(2)}€`;
-    ptsRow.style.display  = 'none';
+    totalEl.innerHTML = `
+      <span style="text-decoration: line-through; color: #a00;">
+        ${oldTotal.toFixed(2)}€
+      </span>
+      &nbsp;${newTotal.toFixed(2)}€
+    `;
   } else {
-    discRow.style.display = 'none';
-    ptsRow.style.display  = 'flex';
+    totalEl.textContent = oldTotal.toFixed(2) + '€';
   }
 
-  // total TTC final
-  document.getElementById('total').innerText = total.toFixed(2) + '€';
-
-  // on rafraîchit vouchers et points
   updateVoucherOptions();
   updateLoyaltyPoints();
 }
