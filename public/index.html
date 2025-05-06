@@ -416,12 +416,12 @@
       const cbs = document.querySelectorAll('input.voucher-checkbox');
       cbs.forEach(cb => cb.addEventListener('click', function(){
         if (this.checked){
-          cbs.forEach(o => o!==this && (o.checked = false));
+          cbs.forEach(o => o !== this && (o.checked = false));
         } else {
           this.checked = false;
         }
-    +   // **nouveau** : rafraîchir immédiatement le calcul des points
-    +   updateLoyaltyPoints();
+    -   updateLoyaltyPoints();
+    +   updateTotal();
       }));
     }
 
@@ -593,22 +593,43 @@
   return 'worldwide';
 }
 
-async function updateTotal() {
+async function updateTotal(){
   const items   = JSON.parse(localStorage.getItem('cartItems')) || [];
   const sub     = items.reduce((a,i) => a + i.price * i.quantity, 0);
-
   const region  = await detectRegion();
-  const shipping = getCombinedShippingCost(items, region);
+  const shipping= getCombinedShippingCost(items, region);
 
-  // TVA calculée sur (sous-total + Livraison)
-  const taxBase = sub + shipping;
-  const tax = taxBase * 0.2;
+  const oldBase = sub + shipping;
+  const oldTax  = oldBase * 0.2;
+  const oldTotal= oldBase + oldTax;
 
-  document.getElementById('subTotal').innerText  = sub.toFixed(2) + '€';
+  // récupération du voucher (value en nombre) s'il y en a
+  const sel = document.querySelector('input.voucher-checkbox:checked');
+  const voucherValue = sel ? Number(sel.value) : 0;
+
+  // nouveau calcul après réduction
+  const newBase  = oldBase - voucherValue;
+  const newTax   = newBase * 0.2;
+  const newTotal = newBase + newTax;
+
+  // mise à jour affichage
+  document.getElementById('subTotal').innerText = sub.toFixed(2) + '€';
   document.getElementById('shipping').innerText = shipping.toFixed(2) + '€';
-  document.getElementById('tax').innerText      = tax.toFixed(2) + '€';
-  document.getElementById('total').innerText    = (sub + tax + shipping).toFixed(2) + '€';
+  document.getElementById('tax').innerText      = newTax.toFixed(2) + '€';
 
+  const totalEl = document.getElementById('total');
+  if (voucherValue > 0) {
+    totalEl.innerHTML = `
+      <span style="text-decoration: line-through; color: #a00;">
+        ${oldTotal.toFixed(2)}€
+      </span>
+      &nbsp;${newTotal.toFixed(2)}€
+    `;
+  } else {
+    totalEl.textContent = oldTotal.toFixed(2) + '€';
+  }
+
+  // on met à jour la section vouchers et les points
   updateVoucherOptions();
   updateLoyaltyPoints();
 }
