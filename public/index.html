@@ -596,26 +596,24 @@
 async function updateTotal() {
   const items   = JSON.parse(localStorage.getItem('cartItems')) || [];
   const sub     = items.reduce((a,i) => a + i.price * i.quantity, 0);
-
-  // détection région + frais de port
   const region   = await detectRegion();
   const shipping = getCombinedShippingCost(items, region);
 
-  // lecture du voucher en localStorage (si coché)
-  const saved    = JSON.parse(localStorage.getItem('appliedVoucher') || 'null');
-  const discount = saved ? Number(saved.voucherValue) : 0;
+  // **nouvelle** lecture du discount
+  const sel      = document.querySelector('input.voucher-checkbox:checked');
+  const discount = sel ? Number(sel.value) : 0;
 
-  // **ANCIEN** base TTC (= sub + shipping + TVA)
+  // ancienne base et totaux
   const oldBase  = sub + shipping;
   const oldTax   = oldBase * 0.2;
   const oldTotal = oldBase + oldTax;
 
-  // **NOUVEAU** après réduction sur sub+shipping
+  // nouvelle base et totaux
   const newBase  = Math.max(0, oldBase - discount);
   const newTax   = newBase * 0.2;
   const newTotal = newBase + newTax;
 
-  // --- AFFICHAGE ---
+  // affichage
   document.getElementById('subTotal').innerText = sub.toFixed(2) + '€';
   document.getElementById('shipping').innerText = shipping.toFixed(2) + '€';
   document.getElementById('tax').innerText      = newTax.toFixed(2) + '€';
@@ -632,7 +630,6 @@ async function updateTotal() {
     totalEl.textContent = oldTotal.toFixed(2) + '€';
   }
 
-  // on remet à jour la liste des vouchers et les points
   updateVoucherOptions();
   updateLoyaltyPoints();
 }
