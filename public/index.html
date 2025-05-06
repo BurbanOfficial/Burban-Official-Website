@@ -246,11 +246,9 @@
         <div class="summary-row total">
           <span>Total</span><span id="total">0€</span>
         </div>
-        <div class="summary-row" id="discount-row" style="display:none;">
-          <span>Réduction</span><span id="discount-amount">-0€</span>
-        </div>
+        <h5>La remise sélectionnée sera appliquée lors du paiement.</h5><br>
         <div class="summary-row" id="loyalty-points-row">
-          <span>Points de fidélité gagnés</span><span id="loyalty-points">0 points</span>
+          <span>Fidélité : points à recevoir</span><span id="loyalty-points">0 points</span>
         </div>
 
         <!-- Section Bons de réduction -->
@@ -413,7 +411,65 @@
 
     // --- Bons de réduction ---
     async function getUserPoints(){try{const u=auth.currentUser;if(u){const d=await db.collection('users').doc(u.uid).get();return d.exists?d.data().points||0:0;}return 0;}catch(e){console.error(e);return 0;}}
-    function updateVoucherOptions(){const div=document.getElementById('voucher-options');if(!auth.currentUser){div.innerHTML=`<p style="font-style:italic;color:#a00;">Connectez-vous pour voir vos coupons.</p>`;return;}getUserPoints().then(points=>{const subt=document.getElementById('subTotal').innerText.replace('€','');const total=parseFloat(subt);const vouchers=[{points:500,value:5,min:30},{points:1000,value:10,min:40},{points:2000,value:20,min:80},{points:2500,value:30,min:100}];let html='';vouchers.forEach(v=>{if(points>=v.points){if(total>=v.min){html+=`<div style="margin-bottom:8px;"><input type="checkbox" class="voucher-checkbox" id="v${v.value}" value="${v.value}" data-points="${v.points}"><label for="v${v.value}" style="cursor:pointer;">€${v.value} coupon (coût ${v.points} pts)</label></div>`;}else{html+=`<div style="margin-bottom:8px;color:#aaa;">€${v.value} coupon (min. ${v.min}€ - coût ${v.points} pts) <em>Inapplicable</em></div>`;}}});if(!html) html='<p>Aucun coupon disponible.</p>';div.innerHTML=html;addVoucherCheckboxListeners();});}
+    
+    function updateVoucherOptions(){
+  const div = document.getElementById('voucher-options');
+  if (!auth.currentUser) {
+    div.innerHTML = `<p style="font-style:italic;color:#a00;">
+                       Connectez-vous pour voir vos coupons.
+                     </p>`;
+    return;
+  }
+
+  getUserPoints().then(points => {
+    // 1️⃣ On récupère les trois composants du total
+    const sub      = parseFloat(document.getElementById('subTotal').innerText.replace('€','')) || 0;
+    const shipping = parseFloat(document.getElementById('shipping').innerText.replace('€','')) || 0;
+    const tax      = parseFloat(document.getElementById('tax').innerText.replace('€','')) || 0;
+
+    // 2️⃣ On calcule le vrai total du panier
+    const total = sub + shipping + tax;
+
+    const vouchers = [
+      { points: 500,  value: 5,  min: 30  },
+      { points: 1000, value: 10, min: 40 },
+      { points: 2000, value: 20, min: 80 },
+      { points: 2500, value: 30, min: 100 },
+    ];
+
+    let html = '';
+    vouchers.forEach(v => {
+      if (points >= v.points) {
+        if (total >= v.min) {
+          html += `
+            <div style="margin-bottom:8px;">
+              <input
+                type="checkbox"
+                class="voucher-checkbox"
+                id="v${v.value}"
+                value="${v.value}"
+                data-points="${v.points}"
+              >
+              <label for="v${v.value}" style="cursor:pointer;">
+                €${v.value} coupon (coût ${v.points} pts)
+              </label>
+            </div>`;
+        } else {
+          html += `
+            <div style="margin-bottom:8px;color:#aaa;">
+              €${v.value} coupon (min. ${v.min}€ – coût ${v.points} pts)
+              <em>Inapplicable</em>
+            </div>`;
+        }
+      }
+    });
+
+    if (!html) html = '<p>Aucun coupon disponible.</p>';
+    div.innerHTML = html;
+    addVoucherCheckboxListeners();
+  });
+}
+
     
     function addVoucherCheckboxListeners(){
       const cbs = document.querySelectorAll('input.voucher-checkbox');
