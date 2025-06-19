@@ -123,210 +123,118 @@ function getCategory(item) {
 }
 
 /**
- * Calcule le coût de livraison pour un article, en fonction de sa catégorie, de sa quantité et de la région.
- * Méthode standard utilisée lorsque tous les articles appartiennent à la même catégorie.
- * @param {Object} item - L'article du panier (doit contenir name et quantity)
- * @param {string} region - La région de livraison (en minuscule)
- * @returns {number} Le coût en centimes.
- */
-function getShippingCost(item, region) {
-  const category = getCategory(item);
-  const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
-  const uniqueCost = rates.unique;
-  const additionalCost = rates.additional;
-  const cost = uniqueCost + (item.quantity - 1) * additionalCost;
-  return Math.round(cost * 100);
-}
-
-/**
- * Calcule le coût total d'expédition pour une liste d'articles, en tenant compte
- * des règles spécifiques pour les produits de catégories différentes.
- * 
- * Si tous les articles sont de la même catégorie, la formule habituelle est utilisée.
- * Si plusieurs catégories sont présentes, le coût de livraison sera :
- *    - Le tarif unique le plus élevé parmi les catégories pour un article.
- *    - Le tarif supplémentaire de chaque catégorie pour les autres articles.
- *
- * @param {Array} items - Liste des articles du panier.
- * @param {string} region - La région de livraison (en minuscule).
- * @returns {number} Le coût total en centimes.
+ * Calcule le coût total d'expédition pour une liste d'articles.
  */
 function getCombinedShippingCost(items, region) {
-  // Regrouper les articles par catégorie et cumuler les quantités
   const groups = {};
   items.forEach(item => {
-    const category = getCategory(item);
-    if (!groups[category]) {
-      groups[category] = 0;
-    }
-    groups[category] += item.quantity;
+    const cat = getCategory(item);
+    groups[cat] = (groups[cat] || 0) + item.quantity;
   });
 
-  const categories = Object.keys(groups);
-  let totalCost = 0;
-  
-  // Si tous les articles appartiennent à une seule catégorie, utiliser la méthode standard
-  if (categories.length === 1) {
-    const category = categories[0];
-    const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
-    totalCost = rates.unique + (groups[category] - 1) * rates.additional;
+  const cats = Object.keys(groups);
+  let total = 0;
+
+  if (cats.length === 1) {
+    const rates = shippingRates[cats[0]][region] || shippingRates[cats[0]].worldwide;
+    total = rates.unique + (groups[cats[0]] - 1) * rates.additional;
   } else {
-    // Plusieurs catégories : déterminer le tarif unique le plus élevé
-    let maxUnique = 0;
-    let maxCategory = null;
-    categories.forEach(category => {
-      const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
+    let maxUnique = 0, maxCat = null;
+    cats.forEach(cat => {
+      const rates = shippingRates[cat][region] || shippingRates[cat].worldwide;
       if (rates.unique > maxUnique) {
         maxUnique = rates.unique;
-        maxCategory = category;
+        maxCat = cat;
       }
     });
-    // Pour la catégorie qui offre le tarif unique maximum, on compte un tarif unique
-    // et pour le reste de ses articles, le tarif additionnel
-    if (maxCategory) {
-      const rates = shippingRates[maxCategory][region] || shippingRates[maxCategory]["worldwide"];
-      totalCost += rates.unique + (groups[maxCategory] - 1) * rates.additional;
+    if (maxCat) {
+      const rates = shippingRates[maxCat][region] || shippingRates[maxCat].worldwide;
+      total += rates.unique + (groups[maxCat] - 1) * rates.additional;
     }
-    // Pour les autres catégories, on applique le tarif additionnel pour chacun des articles
-    categories.forEach(category => {
-      if (category !== maxCategory) {
-        const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
-        totalCost += groups[category] * rates.additional;
+    cats.forEach(cat => {
+      if (cat !== maxCat) {
+        const rates = shippingRates[cat][region] || shippingRates[cat].worldwide;
+        total += groups[cat] * rates.additional;
       }
     });
   }
-  
-  return Math.round(totalCost * 100);
+
+  return Math.round(total * 100);
 }
 
 // Mapping des codes pays vers nos régions
-const countryToRegion = {
-  us: 'us',
-  ca: 'canada',
-  gb: 'uk',
-  uk: 'uk',
-  jp: 'japan',
-  au: 'australia',
-  br: 'brazil'
-};
-
-// Liste de codes pays européens (en minuscule)
-const euCountries = [
-  'at','be','bg','cy','cz','dk','ee','fi','fr','de','gr','hr','hu',
-  'ie','it','lv','lt','lu','mt','nl','pl','pt','ro','sk','si','es','se'
-];
+const countryToRegion = { us:'us', ca:'canada', gb:'uk', uk:'uk', jp:'japan', au:'australia', br:'brazil' };
+const euCountries = ['at','be','bg','cy','cz','dk','ee','fi','fr','de','gr','hr','hu','ie','it','lv','lt','lu','mt','nl','pl','pt','ro','sk','si','es','se'];
 
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { items, voucher } = req.body;
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: "Aucun article dans le panier." });
-    }
-    
-    // Détermination de la région de l'utilisateur via GeoIP
-    const xForwardedFor = req.headers['x-forwarded-for'];
-    const ip = xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.connection.remoteAddress;
+    if (!items?.length) return res.status(400).json({ error: "Aucun article dans le panier." });
+
+    // Détection région via GeoIP
+    const xff = req.headers['x-forwarded-for'];
+    const ip = xff ? xff.split(',')[0].trim() : req.connection.remoteAddress;
     const geo = geoip.lookup(ip);
-    let region = 'worldwide'; // Par défaut
-    if (geo && geo.country) {
-      const countryCode = geo.country.toLowerCase();
-      console.log("Détection GeoIP :", countryCode);
-      if (countryToRegion[countryCode]) {
-        region = countryToRegion[countryCode];
-      } else if (euCountries.includes(countryCode)) {
-        region = 'europe';
-      }
+    let region = 'worldwide';
+    if (geo?.country) {
+      const cc = geo.country.toLowerCase();
+      if (countryToRegion[cc]) region = countryToRegion[cc];
+      else if (euCountries.includes(cc)) region = 'europe';
     }
-    
-    // Création des line_items pour les produits avec application de la taxe
+
+    // Ligne produits
     const productLineItems = items.map(item => ({
       price_data: {
         currency: 'eur',
-        product_data: {
-          name: item.name,
-          description: "Size : " + item.size,
-          images: [item.image],
-        },
+        product_data: { name: item.name, description: "Size : " + item.size, images: [item.image] },
         unit_amount: Math.round(item.price * 100),
       },
       quantity: item.quantity,
-      tax_rates: [process.env.TAX_RATE_ID] // Application de la TVA à 20%
+      tax_rates: [process.env.TAX_RATE_ID]
     }));
 
-    // Calcul du montant total des produits (hors frais de port)
-    const productsTotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    
-    // Livraison gratuite à partir de 50 €
-    let shippingTotal = 0;
-    if (productsTotal < 50) {
-      shippingTotal = getCombinedShippingCost(items, region);
+    // Calcul total produits
+    const totalProducts = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const totalInCents  = Math.round(totalProducts * 100);
+
+    // Frais de port ou gratuité
+    let shippingLine;
+    if (totalInCents < 5000) {
+      const shippingTotal = getCombinedShippingCost(items, region);
+      shippingLine = {
+        price_data: { currency: 'eur', product_data: { name: "Frais de port" }, unit_amount: shippingTotal },
+        quantity: 1,
+        tax_rates: [process.env.TAX_RATE_ID]
+      };
+    } else {
+      shippingLine = {
+        price_data: { currency: 'eur', product_data: { name: "Livraison gratuite à partir de 50 €" }, unit_amount: 0 },
+        quantity: 1,
+        tax_rates: [process.env.TAX_RATE_ID]
+      };
     }
 
-    // Création du line_item pour les frais de livraison (si applicable) avec application de la taxe
-    let lineItems = productLineItems;
-    if (shippingTotal > 0) {
-    lineItems.push({
-      price_data: {
-        currency: 'eur',
-        product_data: { name: "Frais de livraison" },
-        unit_amount: shippingTotal,
-      },
-      quantity: 1,
-      tax_rates: [process.env.TAX_RATE_ID]
-    });
-  } else {
-    lineItems.push({
-      price_data: {
-        currency: 'eur',
-        product_data: { name: "Livraison gratuite (commande ≥ 50 €)" },
-        unit_amount: 0,
-      },
-      quantity: 1,
-    });
-  }
+    const lineItems = [...productLineItems, shippingLine];
 
-    // Préparation des coupons (discounts) en fonction du voucher envoyé
+    // Coupons
     let discounts = [];
-    if (voucher && voucher.voucherValue) {
-      if (voucher.voucherValue === "5") {
-        discounts.push({ coupon: process.env.COUPON_5 });
-      } else if (voucher.voucherValue === "10") {
-        discounts.push({ coupon: process.env.COUPON_10 });
-      } else if (voucher.voucherValue === "20") {
-        discounts.push({ coupon: process.env.COUPON_20 });
-      } else if (voucher.voucherValue === "30") {
-        discounts.push({ coupon: process.env.COUPON_30 });
-      }
+    if (voucher?.voucherValue) {
+      const map = { "5":process.env.COUPON_5, "10":process.env.COUPON_10, "20":process.env.COUPON_20, "30":process.env.COUPON_30 };
+      if (map[voucher.voucherValue]) discounts.push({ coupon: map[voucher.voucherValue] });
     }
 
-    // Création de la session Checkout (sans default_tax_rates, les taxes sont appliquées par line_item)
+    // Création session Checkout
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: [
-    'card',            // Cartes & Cartes bancaires (Apple Pay & Google Pay inclus si activés)
-    'link',            // Link
-    'revolut_pay',     // Revolut
-    'bancontact',      // Bancontact
-    'blik',            // Blik
-    'eps',             // EPS
-    'ideal',           // iDEAL
-    'billie',          // Billie
-    'klarna'           // Klarna
-  ],
+      payment_method_types: ['card','link','revolut_pay','bancontact','blik','eps','ideal','billie','klarna'],
       billing_address_collection: 'required',
-      shipping_address_collection: {
-        allowed_countries: [ 
-          'US','CA','AC','AD','AE','AG','AI','AL','AM','AO','AQ','AR','AT','AU','AW','AZ','BA','BB','BD','BE','BF','BG','BH','BI','BJ','BM','BN','BO','BR','BS','BV','BW','BZ','CD','CF','CG','CH','CI','CK','CL','CM','CN','CO','CR','CV','CW','CY','CZ','DE','DJ','DK','DM','DO','DZ','EE','EG','EH','ER','ES','ET','FI','FJ','FK','FO','FR','GA','GB','GD','GE','GF','GG','GH','GI','GL','GM','GN','GP','GQ','GR','GS','GT','GW','GY','HK','HN','HR','HT','HU','ID','IE','IL','IM','IN','IO','IQ','IS','IT','JE','JM','JO','JP','KE','KG','KH','KI','KM','KN','KR','KW','KY','KZ','LB','LC','LI','LK','LR','LS','LT','LU','LV','MA','MC','MD','ME','MF','MG','MK','ML','MM','MO','MQ','MR','MS','MT','MU','MV','MW','MX','MY','MZ','NA','NC','NE','NG','NI','NL','NO','NP','NR','NU','NZ','OM','PA','PE','PF','PG','PH','PK','PL','PM','PN','PS','PT','PY','QA','RE','RO','RS','RW','SA','SB','SC','SD','SE','SG','SH','SI','SJ','SK','SL','SM','SN','SO','SR','ST','SV','SZ','TA','TF','TG','TH','TK','TL','TN','TO','TR','TT','TV','TW','TZ','UA','UG','UY','UZ','VA','VC','VE','VG','VN','VU','WF','XK','YT','ZA','ZM','ZW','ZZ'
-        ],
-      },
+      shipping_address_collection: { allowed_countries: Object.keys(countryToRegion).map(c=>c.toUpperCase()).concat(euCountries.map(c=>c.toUpperCase())) },
       line_items: lineItems,
-      // Si un voucher a été envoyé, on ajoute les discounts,
-      // sinon, on autorise l'utilisation de promotion_codes directement dans Stripe.
-      ...(discounts.length > 0 ? { discounts } : { allow_promotion_codes: true }),
+      ...(discounts.length ? { discounts } : { allow_promotion_codes: true }),
       mode: 'payment',
       success_url: 'https://burbanofficial.com/public/success.html',
-      cancel_url: 'https://burbanofficial.com/public/cancel.html'
+      cancel_url:  'https://burbanofficial.com/public/cancel.html',
     });
-    
+
     res.json({ sessionId: session.id, url: session.url });
   } catch (error) {
     console.error("Erreur:", error);
@@ -337,20 +245,12 @@ app.post('/create-checkout-session', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
 
-// Code pour garder le serveur actif en se pinguant régulièrement
-const https = require('https'); // Utilisation du module https pour les requêtes sécurisées
-const SERVER_URL = 'https://burban-stripe-service.onrender.com'; // Remplacez par l'URL publique de votre app
-
+// Ping pour garder le serveur actif
+const https = require('https');
+const SERVER_URL = 'https://burban-stripe-service.onrender.com';
 function pingSelf() {
-  https.get(SERVER_URL, (res) => {
-    console.log(`Ping effectué avec succès. Statut: ${res.statusCode}`);
-  }).on('error', (err) => {
-    console.error('Erreur lors du ping :', err.message);
-  });
+  https.get(SERVER_URL, res => console.log(`Ping réussi: ${res.statusCode}`))
+       .on('error', err => console.error('Ping erreur:', err.message));
 }
-
-// Ping toutes les 3 minutes (180000 millisecondes)
 setInterval(pingSelf, 180000);
-
-// Ping initial au démarrage
 pingSelf();
