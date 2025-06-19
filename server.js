@@ -253,22 +253,37 @@ app.post('/create-checkout-session', async (req, res) => {
       tax_rates: [process.env.TAX_RATE_ID] // Application de la TVA à 20%
     }));
 
-    // Calcul global des frais de livraison pour tous les articles en fonction de la région détectée
-    const shippingTotal = getCombinedShippingCost(items, region);
+    // Calcul du montant total des produits (hors frais de port)
+    const productsTotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    
+    // Livraison gratuite à partir de 50 €
+    let shippingTotal = 0;
+    if (productsTotal < 50) {
+      shippingTotal = getCombinedShippingCost(items, region);
+    }
 
     // Création du line_item pour les frais de livraison (si applicable) avec application de la taxe
     let lineItems = productLineItems;
     if (shippingTotal > 0) {
-      lineItems.push({
-        price_data: {
-          currency: 'eur',
-          product_data: { name: "Shipping Cost" },
-          unit_amount: shippingTotal,
-        },
-        quantity: 1,
-        tax_rates: [process.env.TAX_RATE_ID]
-      });
-    }
+    lineItems.push({
+      price_data: {
+        currency: 'eur',
+        product_data: { name: "Frais de livraison" },
+        unit_amount: shippingTotal,
+      },
+      quantity: 1,
+      tax_rates: [process.env.TAX_RATE_ID]
+    });
+  } else {
+    lineItems.push({
+      price_data: {
+        currency: 'eur',
+        product_data: { name: "Livraison gratuite (commande ≥ 50 €)" },
+        unit_amount: 0,
+      },
+      quantity: 1,
+    });
+  }
 
     // Préparation des coupons (discounts) en fonction du voucher envoyé
     let discounts = [];
