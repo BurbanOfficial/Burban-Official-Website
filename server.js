@@ -257,7 +257,7 @@ app.post('/create-checkout-session', async (req, res) => {
     const itemsTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     // Calcul global des frais de livraison pour tous les articles en fonction de la région détectée
-    const shippingTotal = getCombinedShippingCost(items, region);
+    let shippingTotal = getCombinedShippingCost(items, region);
 
     // Livraison gratuite dès 50 € d'achat
     if (itemsTotal >= 50) {
