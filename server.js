@@ -253,8 +253,16 @@ app.post('/create-checkout-session', async (req, res) => {
       tax_rates: [process.env.TAX_RATE_ID] // Application de la TVA à 20%
     }));
 
+    // --- AJOUT : calcul du total des articles pour la livraison gratuite ---
+    const itemsTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
     // Calcul global des frais de livraison pour tous les articles en fonction de la région détectée
     const shippingTotal = getCombinedShippingCost(items, region);
+
+    // Livraison gratuite dès 50 € d'achat
+    if (itemsTotal >= 50) {
+      shippingTotal = 0;
+    }
 
     // Création du line_item pour les frais de livraison (si applicable) avec application de la taxe
     let lineItems = productLineItems;
