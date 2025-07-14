@@ -298,10 +298,7 @@ app.post('/create-checkout-session', async (req, res) => {
     'card',            // Cartes & Cartes bancaires (Apple Pay & Google Pay inclus si activés)
     'link',            // Link
     'revolut_pay',     // Revolut
-    'bancontact',      // Bancontact
-    'blik',            // Blik
-    'eps',             // EPS
-    'ideal',           // iDEAL
+    'amazon_pay',      // Amazon
     'billie',          // Billie
     'klarna'           // Klarna
   ],
