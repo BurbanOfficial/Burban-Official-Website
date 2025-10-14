@@ -289,6 +289,16 @@ app.post('/create-checkout-session', async (req, res) => {
         discounts.push({ coupon: process.env.COUPON_20 });
       } else if (voucher.voucherValue === "30") {
         discounts.push({ coupon: process.env.COUPON_30 });
+      } else {
+        // Cas des codes promo textuels (ex: WELCOME10 pour -10%)
+        // On accepte aussi que l'utilisateur ait mis "WELCOME10" dans voucher.voucherValue
+        if (v.toUpperCase() === "WELCOME10" || code === "WELCOME10") {
+          if (!process.env.WELCOME10) {
+            console.warn("ENV WELCOME10 absent — vérifiez que vous avez bien mis l'ID du coupon Stripe % dans vos variables d'environnement.");
+          }
+          discounts.push({ coupon: process.env.WELCOME10 });
+        }
+        // vous pouvez ajouter d'autres codes textuels ici si besoin
       }
     }
 
