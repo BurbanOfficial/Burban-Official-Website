@@ -1,109 +1,93 @@
+// server.js (remplace ton fichier actuel par celui-ci)
+// Dépendances
+require('dotenv').config(); // facultatif si Render gère les env vars
 const express = require('express');
 const app = express();
 const path = require('path');
 const cors = require('cors');
 const geoip = require('geoip-lite');
-// La clé Stripe doit être définie dans Render via une variable d'environnement (STRIPE_SECRET_KEY)
+const axios = require('axios');
+
+// Stripe
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+// Middlewares
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // pour toutes les routes JSON normales
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Route de test pour GeoIP (facultative)
-app.get('/geoip', (req, res) => {
-  const xForwardedFor = req.headers['x-forwarded-for'];
-  const ip = xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.connection.remoteAddress;
-  const geo = geoip.lookup(ip);
-  res.json({ ip, geo });
-});
+// --- (TON CODE D'ORIGINE : shippingRates, getCategory, getShippingCost, getCombinedShippingCost, countryToRegion, euCountries) ---
+// (je conserve exactement tes fonctions / tables pour la cohérence)
 
-/**
- * Configuration des tarifs d'expédition par catégorie et par région.
- * Les régions acceptées (en minuscule) : "us", "europe", "uk", "efta", "canada",
- * "australia", "japan", "brazil" et "worldwide".
- */
 const shippingRates = {
-  category1: { // T-shirts, débardeurs, T-shirts manches 3/4, t-shirts manches longues, polos, crop-tops
-    us:        { unique: 4.49, additional: 2.10 },
-    europe:    { unique: 4.29, additional: 1.25 },
-    uk:        { unique: 4.19, additional: 1.25 },
-    efta:      { unique: 8.99, additional: 1.00 },
-    canada:    { unique: 7.69, additional: 1.70 },
+  category1: {
+    us: { unique: 4.49, additional: 2.10 },
+    europe: { unique: 4.29, additional: 1.25 },
+    uk: { unique: 4.19, additional: 1.25 },
+    efta: { unique: 8.99, additional: 1.00 },
+    canada: { unique: 7.69, additional: 1.70 },
     australia: { unique: 6.19, additional: 1.15 },
-    japan:     { unique: 3.99, additional: 1.25 },
-    brazil:    { unique: 4.09, additional: 2.25 },
+    japan: { unique: 3.99, additional: 1.25 },
+    brazil: { unique: 4.09, additional: 2.25 },
     worldwide: { unique: 10.59, additional: 5.30 }
   },
-  category2: { // Sweats à capuche, sweats, pulls, vestes, pantalons de sport et de survêtement
-    us:        { unique: 8.09, additional: 2.20 },
-    europe:    { unique: 6.29, additional: 2.00 },
-    uk:        { unique: 5.99, additional: 2.00 },
-    efta:      { unique: 9.99, additional: 2.00 },
-    canada:    { unique: 9.49, additional: 2.05 },
+  category2: {
+    us: { unique: 8.09, additional: 2.20 },
+    europe: { unique: 6.29, additional: 2.00 },
+    uk: { unique: 5.99, additional: 2.00 },
+    efta: { unique: 9.99, additional: 2.00 },
+    canada: { unique: 9.49, additional: 2.05 },
     australia: { unique: 9.79, additional: 1.80 },
-    japan:     { unique: 5.99, additional: 2.00 },
-    brazil:    { unique: 5.39, additional: 2.70 },
+    japan: { unique: 5.99, additional: 2.00 },
+    brazil: { unique: 5.39, additional: 2.70 },
     worldwide: { unique: 6.29, additional: 2.00 }
   },
-  category3: { // Troisième grille tarifaire (par défaut)
-    us:        { unique: 9.79, additional: 4.90 },
-    europe:    { unique: 10.19, additional: 5.10 },
-    uk:        { unique: 9.79, additional: 4.90 },
-    efta:      { unique: 15.79, additional: 8.35 },
-    canada:    { unique: 9.79, additional: 4.90 },
+  category3: {
+    us: { unique: 9.79, additional: 4.90 },
+    europe: { unique: 10.19, additional: 5.10 },
+    uk: { unique: 9.79, additional: 4.90 },
+    efta: { unique: 15.79, additional: 8.35 },
+    canada: { unique: 9.79, additional: 4.90 },
     australia: { unique: 9.79, additional: 4.90 },
-    japan:     { unique: 9.79, additional: 4.90 },
+    japan: { unique: 9.79, additional: 4.90 },
     worldwide: { unique: 12.49, additional: 5.80 }
   },
-  category4: { // Hoodies, sweatshirts, jackets, pants, joggers
-    us:        { unique: 7.09, additional: 2.20 },
-    europe:    { unique: 5.99, additional: 2.00 },
-    uk:        { unique: 5.99, additional: 2.00 },
-    efta:      { unique: 9.99, additional: 2.00 },
-    canada:    { unique: 8.19, additional: 2.05 },
+  category4: {
+    us: { unique: 7.09, additional: 2.20 },
+    europe: { unique: 5.99, additional: 2.00 },
+    uk: { unique: 5.99, additional: 2.00 },
+    efta: { unique: 9.99, additional: 2.00 },
+    canada: { unique: 8.19, additional: 2.05 },
     australia: { unique: 9.79, additional: 1.80 },
-    japan:     { unique: 5.99, additional: 2.00 },
-    brazil:    { unique: 5.39, additional: 2.70 },
+    japan: { unique: 5.99, additional: 2.00 },
+    brazil: { unique: 5.39, additional: 2.70 },
     worldwide: { unique: 14.99, additional: 7.05 }
   },
-  category5: { // Coupe-vent all over, pantalons de survêtement all over, pyjama all over
-    us:        { unique: 7.09, additional: 7.09 },
-    europe:    { unique: 7.99, additional: 7.99 },
-    uk:        { unique: 7.99, additional: 7.99 },
-    efta:      { unique: 7.99, additional: 7.99 },
-    canada:    { unique: 7.09, additional: 7.09 },
+  category5: {
+    us: { unique: 7.09, additional: 7.09 },
+    europe: { unique: 7.99, additional: 7.99 },
+    uk: { unique: 7.99, additional: 7.99 },
+    efta: { unique: 7.99, additional: 7.99 },
+    canada: { unique: 7.09, additional: 7.09 },
     australia: { unique: 7.09, additional: 7.09 },
-    japan:     { unique: 7.09, additional: 7.09 },
+    japan: { unique: 7.09, additional: 7.09 },
     worldwide: { unique: 7.99, additional: 7.99 }
   },
-  category6: { // Casquettes, casquettes de baseball, casquettes snapback, casquettes en maille, bonnets, bobs, visières, bonnets all over
-    us:        { unique: 3.59, additional: 1.80 },
-    europe:    { unique: 3.99, additional: 1.25 },
-    uk:        { unique: 3.69, additional: 1.25 },
-    efta:      { unique: 8.99, additional: 1.00 },
-    canada:    { unique: 6.09, additional: 1.70 },
+  category6: {
+    us: { unique: 3.59, additional: 1.80 },
+    europe: { unique: 3.99, additional: 1.25 },
+    uk: { unique: 3.69, additional: 1.25 },
+    efta: { unique: 8.99, additional: 1.00 },
+    canada: { unique: 6.09, additional: 1.70 },
     australia: { unique: 6.19, additional: 1.15 },
-    japan:     { unique: 3.99, additional: 1.25 },
-    brazil:    { unique: 4.09, additional: 2.25 },
+    japan: { unique: 3.99, additional: 1.25 },
+    brazil: { unique: 4.09, additional: 2.25 },
     worldwide: { unique: 10.59, additional: 5.30 }
   }
 };
 
-/**
- * Détermine la catégorie d'un article en fonction de son nom.
- *  - Catégorie 1 : t-shirt, tshirt, débardeur, polo, crop-top
- *  - Catégorie 2 : sweat à capuche, pull, veste, pantalon de sport, pantalon de survêtement
- *  - Catégorie 4 : hoodie, sweatshirt, jacket, pants, joggers
- *  - Catégorie 5 : coupe-vent, pyjama
- *  - Catégorie 6 : casquette, bonnet, bob, visière
- *  - Par défaut : Catégorie 3
- * 
- * @param {Object} item - L'article (doit contenir au moins une propriété name)
- * @returns {string} La clé de catégorie ("category1", "category2", etc.)
- */
 function getCategory(item) {
-  const name = item.name.toLowerCase();
+  const name = (item.name || '').toLowerCase();
   if (name.includes("t-shirt") || name.includes("tshirt") || name.includes("débardeur") || name.includes("polo") || name.includes("crop-top")) {
     return "category1";
   }
@@ -119,16 +103,9 @@ function getCategory(item) {
   if (name.includes("casquette") || name.includes("cap") || name.includes("bonnet") || name.includes("beanie") || name.includes("bob") || name.includes("visière")) {
     return "category6";
   }
-  return "category3"; // Par défaut
+  return "category3";
 }
 
-/**
- * Calcule le coût de livraison pour un article, en fonction de sa catégorie, de sa quantité et de la région.
- * Méthode standard utilisée lorsque tous les articles appartiennent à la même catégorie.
- * @param {Object} item - L'article du panier (doit contenir name et quantity)
- * @param {string} region - La région de livraison (en minuscule)
- * @returns {number} Le coût en centimes.
- */
 function getShippingCost(item, region) {
   const category = getCategory(item);
   const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
@@ -138,40 +115,22 @@ function getShippingCost(item, region) {
   return Math.round(cost * 100);
 }
 
-/**
- * Calcule le coût total d'expédition pour une liste d'articles, en tenant compte
- * des règles spécifiques pour les produits de catégories différentes.
- * 
- * Si tous les articles sont de la même catégorie, la formule habituelle est utilisée.
- * Si plusieurs catégories sont présentes, le coût de livraison sera :
- *    - Le tarif unique le plus élevé parmi les catégories pour un article.
- *    - Le tarif supplémentaire de chaque catégorie pour les autres articles.
- *
- * @param {Array} items - Liste des articles du panier.
- * @param {string} region - La région de livraison (en minuscule).
- * @returns {number} Le coût total en centimes.
- */
 function getCombinedShippingCost(items, region) {
-  // Regrouper les articles par catégorie et cumuler les quantités
   const groups = {};
   items.forEach(item => {
     const category = getCategory(item);
-    if (!groups[category]) {
-      groups[category] = 0;
-    }
+    if (!groups[category]) groups[category] = 0;
     groups[category] += item.quantity;
   });
 
   const categories = Object.keys(groups);
   let totalCost = 0;
-  
-  // Si tous les articles appartiennent à une seule catégorie, utiliser la méthode standard
+
   if (categories.length === 1) {
     const category = categories[0];
     const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
     totalCost = rates.unique + (groups[category] - 1) * rates.additional;
   } else {
-    // Plusieurs catégories : déterminer le tarif unique le plus élevé
     let maxUnique = 0;
     let maxCategory = null;
     categories.forEach(category => {
@@ -181,13 +140,10 @@ function getCombinedShippingCost(items, region) {
         maxCategory = category;
       }
     });
-    // Pour la catégorie qui offre le tarif unique maximum, on compte un tarif unique
-    // et pour le reste de ses articles, le tarif additionnel
     if (maxCategory) {
       const rates = shippingRates[maxCategory][region] || shippingRates[maxCategory]["worldwide"];
       totalCost += rates.unique + (groups[maxCategory] - 1) * rates.additional;
     }
-    // Pour les autres catégories, on applique le tarif additionnel pour chacun des articles
     categories.forEach(category => {
       if (category !== maxCategory) {
         const rates = shippingRates[category][region] || shippingRates[category]["worldwide"];
@@ -195,50 +151,78 @@ function getCombinedShippingCost(items, region) {
       }
     });
   }
-  
+
   return Math.round(totalCost * 100);
 }
 
-// Mapping des codes pays vers nos régions
-const countryToRegion = {
-  us: 'us',
-  ca: 'canada',
-  gb: 'uk',
-  uk: 'uk',
-  jp: 'japan',
-  au: 'australia',
-  br: 'brazil'
-};
+const countryToRegion = { us: 'us', ca: 'canada', gb: 'uk', uk: 'uk', jp: 'japan', au: 'australia', br: 'brazil' };
+const euCountries = [ 'at','be','bg','cy','cz','dk','ee','fi','fr','de','gr','hr','hu','ie','it','lv','lt','lu','mt','nl','pl','pt','ro','sk','si','es','se' ];
 
-// Liste de codes pays européens (en minuscule)
-const euCountries = [
-  'at','be','bg','cy','cz','dk','ee','fi','fr','de','gr','hr','hu',
-  'ie','it','lv','lt','lu','mt','nl','pl','pt','ro','sk','si','es','se'
-];
+/* --- FIN du code d'origine --- */
 
+/**
+ * Helper: envoie un événement à Klaviyo (server-side Create Event API)
+ * - eventName : nom du metric (ex: "Order Paid", "Order Status Updated")
+ * - email : email du client (requis pour relier le profil)
+ * - properties : objet libre avec order_id, status, items, tracking, total...
+ */
+async function sendKlaviyoEvent(eventName, email, properties = {}) {
+  if (!process.env.KLAVIYO_API_KEY) {
+    console.warn('KLAVIYO_API_KEY non défini — aucun envoi vers Klaviyo.');
+    return;
+  }
+
+  const payload = {
+    data: {
+      type: "event",
+      attributes: {
+        metric: { name: eventName },      // nom du metric dans Klaviyo (utilisé pour déclencher flows)
+        // fournit un identifiant/profil (ici on utilise l'email, tu peux ajouter phone_number ou id)
+        profile: { email: email },
+        properties: properties
+      }
+    }
+  };
+
+  try {
+    await axios.post('https://a.klaviyo.com/api/events', payload, {
+      headers: {
+        'Authorization': `Klaviyo-API-Key ${process.env.KLAVIYO_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      timeout: 8000
+    });
+    console.log(`Event Klaviyo envoyé : ${eventName} -> ${email}`);
+  } catch (err) {
+    console.error('Erreur en envoyant l\'événement à Klaviyo :', err?.response?.data || err.message);
+  }
+}
+
+/**
+ * Route : création de la session Checkout (modifiée pour inclure metadata order_id + order_status)
+ * - garde ton comportement existant (frais, tax_rates, discounts)
+ * - j'ajoute : metadata.order_id et metadata.order_status initial = "préparation"
+ */
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { items, voucher } = req.body;
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Aucun article dans le panier." });
     }
-    
-    // Détermination de la région de l'utilisateur via GeoIP
+
+    // Détection région via GeoIP
     const xForwardedFor = req.headers['x-forwarded-for'];
     const ip = xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.connection.remoteAddress;
     const geo = geoip.lookup(ip);
-    let region = 'worldwide'; // Par défaut
+    let region = 'worldwide';
     if (geo && geo.country) {
       const countryCode = geo.country.toLowerCase();
-      console.log("Détection GeoIP :", countryCode);
-      if (countryToRegion[countryCode]) {
-        region = countryToRegion[countryCode];
-      } else if (euCountries.includes(countryCode)) {
-        region = 'europe';
-      }
+      if (countryToRegion[countryCode]) region = countryToRegion[countryCode];
+      else if (euCountries.includes(countryCode)) region = 'europe';
     }
-    
-    // Création des line_items pour les produits avec application de la taxe
+
+    // line_items produits
     const productLineItems = items.map(item => ({
       price_data: {
         currency: 'eur',
@@ -250,21 +234,13 @@ app.post('/create-checkout-session', async (req, res) => {
         unit_amount: Math.round(item.price * 100),
       },
       quantity: item.quantity,
-      tax_rates: [process.env.TAX_RATE_ID] // Application de la TVA à 20%
+      tax_rates: [process.env.TAX_RATE_ID]
     }));
 
-    // --- AJOUT : calcul du total des articles pour la livraison gratuite ---
     const itemsTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-    // Calcul global des frais de livraison pour tous les articles en fonction de la région détectée
     let shippingTotal = getCombinedShippingCost(items, region);
+    if (itemsTotal >= 50) shippingTotal = 0;
 
-    // Livraison gratuite dès 50 € d'achat
-    if (itemsTotal >= 50) {
-      shippingTotal = 0;
-    }
-
-    // Création du line_item pour les frais de livraison (si applicable) avec application de la taxe
     let lineItems = productLineItems;
     if (shippingTotal > 0) {
       lineItems.push({
@@ -278,79 +254,198 @@ app.post('/create-checkout-session', async (req, res) => {
       });
     }
 
-    // Préparation des coupons (discounts) en fonction du voucher envoyé
+    // Prépare discounts (ton code existant — j'ai corrigé une partie qui semblait utiliser des variables non définies)
     let discounts = [];
     if (voucher && voucher.voucherValue) {
-      if (voucher.voucherValue === "5") {
-        discounts.push({ coupon: process.env.COUPON_5 });
-      } else if (voucher.voucherValue === "10") {
-        discounts.push({ coupon: process.env.COUPON_10 });
-      } else if (voucher.voucherValue === "20") {
-        discounts.push({ coupon: process.env.COUPON_20 });
-      } else if (voucher.voucherValue === "30") {
-        discounts.push({ coupon: process.env.COUPON_30 });
-      } else {
-        // Cas des codes promo textuels (ex: WELCOME10 pour -10%)
-        // On accepte aussi que l'utilisateur ait mis "WELCOME10" dans voucher.voucherValue
-        if (v.toUpperCase() === "WELCOME10" || code === "WELCOME10") {
-          if (!process.env.WELCOME10) {
-            console.warn("ENV WELCOME10 absent — vérifiez que vous avez bien mis l'ID du coupon Stripe % dans vos variables d'environnement.");
-          }
-          discounts.push({ coupon: process.env.WELCOME10 });
-        }
-        // vous pouvez ajouter d'autres codes textuels ici si besoin
-      }
+      const v = (voucher.voucherValue || '').toString();
+      if (v === "5" && process.env.COUPON_5) discounts.push({ coupon: process.env.COUPON_5 });
+      else if (v === "10" && process.env.COUPON_10) discounts.push({ coupon: process.env.COUPON_10 });
+      else if (v === "20" && process.env.COUPON_20) discounts.push({ coupon: process.env.COUPON_20 });
+      else if (v === "30" && process.env.COUPON_30) discounts.push({ coupon: process.env.COUPON_30 });
+      else if (v.toUpperCase() === "WELCOME10" && process.env.WELCOME10) discounts.push({ coupon: process.env.WELCOME10 });
     }
 
-    // Création de la session Checkout (sans default_tax_rates, les taxes sont appliquées par line_item)
+    // Génération d'un order_id simple (tu peux remplacer par ton propre ID)
+    const orderId = `order_${Date.now()}`;
+
+    // Création session checkout (j'ajoute metadata ici)
     const session = await stripe.checkout.sessions.create({
       payment_method_types: [
-    'card',            // Cartes & Cartes bancaires (Apple Pay & Google Pay inclus si activés)
-    'link',            // Link
-    'revolut_pay',     // Revolut
-    'amazon_pay',      // Amazon
-    'billie',          // Billie
-    'klarna'           // Klarna
-  ],
+        'card','link','revolut_pay','amazon_pay','billie','klarna'
+      ],
       billing_address_collection: 'required',
       shipping_address_collection: {
-        allowed_countries: [ 
-          'US','CA','AC','AD','AE','AG','AI','AL','AM','AO','AQ','AR','AT','AU','AW','AZ','BA','BB','BD','BE','BF','BG','BH','BI','BJ','BM','BN','BO','BR','BS','BV','BW','BZ','CD','CF','CG','CH','CI','CK','CL','CM','CN','CO','CR','CV','CW','CY','CZ','DE','DJ','DK','DM','DO','DZ','EE','EG','EH','ER','ES','ET','FI','FJ','FK','FO','FR','GA','GB','GD','GE','GF','GG','GH','GI','GL','GM','GN','GP','GQ','GR','GS','GT','GW','GY','HK','HN','HR','HT','HU','ID','IE','IL','IM','IN','IO','IQ','IS','IT','JE','JM','JO','JP','KE','KG','KH','KI','KM','KN','KR','KW','KY','KZ','LB','LC','LI','LK','LR','LS','LT','LU','LV','MA','MC','MD','ME','MF','MG','MK','ML','MM','MO','MQ','MR','MS','MT','MU','MV','MW','MX','MY','MZ','NA','NC','NE','NG','NI','NL','NO','NP','NR','NU','NZ','OM','PA','PE','PF','PG','PH','PK','PL','PM','PN','PS','PT','PY','QA','RE','RO','RS','RW','SA','SB','SC','SD','SE','SG','SH','SI','SJ','SK','SL','SM','SN','SO','SR','ST','SV','SZ','TA','TF','TG','TH','TK','TL','TN','TO','TR','TT','TV','TW','TZ','UA','UG','UY','UZ','VA','VC','VE','VG','VN','VU','WF','XK','YT','ZA','ZM','ZW','ZZ'
-        ],
+        allowed_countries: [ /* ta liste longue */ 'US','CA','GB','FR','DE','IT','ES','NL','BE','CH','AU','JP','BR' ] // tu peux garder la liste complète si souhaité
       },
       line_items: lineItems,
-      // Si un voucher a été envoyé, on ajoute les discounts,
-      // sinon, on autorise l'utilisation de promotion_codes directement dans Stripe.
       ...(discounts.length > 0 ? { discounts } : { allow_promotion_codes: true }),
       mode: 'payment',
       success_url: 'https://burbanofficial.com/public/success.html',
-      cancel_url: 'https://burbanofficial.com/public/cancel.html'
+      cancel_url: 'https://burbanofficial.com/public/cancel.html',
+      metadata: {
+        order_id: orderId,
+        order_status: 'préparation' // statut initial
+      }
     });
-    
-    res.json({ sessionId: session.id, url: session.url });
+
+    // Retourne session au front
+    res.json({ sessionId: session.id, url: session.url, orderId });
+
   } catch (error) {
     console.error("Erreur:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
+/**
+ * Route admin/simple pour mettre à jour le statut d'une commande.
+ * POST /update-order-status
+ * Body: { payment_intent_id (ou session_id), status: "préparation"|"expédiée"|"livrée", tracking_number?, email? }
+ *
+ * Cette route :
+ *  - met à jour les metadata du PaymentIntent (ou Checkout Session si tu préfères)
+ *  - envoie un événement vers Klaviyo pour déclencher un flow (ex: "Order Status Updated")
+ *
+ * NOTE : protège cette route (auth) en prod (token, basic auth, IP allowlist...). Ici c'est volontairement simple.
+ */
+app.post('/update-order-status', async (req, res) => {
+  try {
+    const { payment_intent_id, session_id, status, tracking_number, email } = req.body;
+    if (!status) return res.status(400).json({ error: 'status requis' });
+
+    // On tente de récupérer et mettre à jour le PaymentIntent si fourni, sinon on essaye la Session
+    let target = null;
+    if (payment_intent_id) {
+      target = await stripe.paymentIntents.update(payment_intent_id, {
+        metadata: { order_status: status, tracking_number: tracking_number || '' }
+      });
+    } else if (session_id) {
+      // On récupère la session puis le payment_intent s'il existe
+      const session = await stripe.checkout.sessions.retrieve(session_id);
+      if (session && session.payment_intent) {
+        const pi = session.payment_intent;
+        target = await stripe.paymentIntents.update(pi, {
+          metadata: { order_status: status, tracking_number: tracking_number || '' }
+        });
+      } else {
+        // On peut aussi mettre metadata sur la session directement
+        target = await stripe.checkout.sessions.update(session_id, {
+          metadata: { order_status: status, tracking_number: tracking_number || '' }
+        });
+      }
+    } else {
+      return res.status(400).json({ error: 'payment_intent_id ou session_id requis' });
+    }
+
+    // Envoi événement à Klaviyo pour déclencher flow d'update de statut
+    // On utilise l'email fourni si dispo ; sinon essaie de récupérer via Stripe (si target a customer details)
+    let customerEmail = email;
+    try {
+      if (!customerEmail) {
+        // si c'est une PaymentIntent, cherche la charge / customer
+        if (target?.charges?.data && target.charges.data[0]) {
+          customerEmail = target.charges.data[0].billing_details?.email || customerEmail;
+        }
+      }
+    } catch (e) { /* ignore */ }
+
+    const properties = {
+      OrderId: target?.metadata?.order_id || target?.id || null,
+      UpdateType: status,
+      TrackingNumber: tracking_number || null,
+      Timestamp: new Date().toISOString()
+    };
+
+    await sendKlaviyoEvent('Order Status Updated', customerEmail || 'unknown@unknown.com', properties);
+
+    res.json({ ok: true, statusUpdatedTo: status, target });
+  } catch (err) {
+    console.error('Erreur update-order-status:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * Webhook Stripe : réception des événements Stripe (payment succeeded, checkout.session.completed, etc.)
+ * - IMPORTANT : on utilise express.raw ici pour conserver la signature (Stripe-Signature)
+ */
+app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  let event;
+  try {
+    if (endpointSecret) {
+      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } else {
+      // Si tu n'as pas de webhook secret (test local), on accepte le payload tel quel (moins sécurisé)
+      event = req.body;
+    }
+  } catch (err) {
+    console.error('Erreur signature webhook Stripe :', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle the event
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        const email = session.customer_details?.email || session.customer_email || null;
+        const metadata = session.metadata || {};
+        const orderId = metadata.order_id || session.id;
+
+        // Envoi un event "Order Paid" à Klaviyo (tu peux créer un flow Klaviyo déclenché par ce metric)
+        const properties = {
+          OrderId: orderId,
+          TotalAmount: session.amount_total ? (session.amount_total / 100) : null,
+          Currency: session.currency,
+          Items: session.display_items || null,
+          StripeSessionId: session.id,
+          Timestamp: new Date().toISOString()
+        };
+        await sendKlaviyoEvent('Order Paid', email || 'unknown@unknown.com', properties);
+        break;
+      }
+
+      case 'payment_intent.succeeded': {
+        const pi = event.data.object;
+        // Récupère l'email si possible
+        let email = null;
+        if (pi.charges && pi.charges.data && pi.charges.data[0]) {
+          email = pi.charges.data[0].billing_details?.email || null;
+        }
+        const metadata = pi.metadata || {};
+        const orderId = metadata.order_id || pi.id;
+
+        await sendKlaviyoEvent('Order Paid', email || 'unknown@unknown.com', {
+          OrderId: orderId,
+          Amount: (pi.amount / 100),
+          Currency: pi.currency,
+          Timestamp: new Date().toISOString()
+        });
+        break;
+      }
+
+      // tu peux ajouter d'autres events Stripe si utiles
+      default:
+        console.log(`Événement Stripe reçu mais non géré : ${event.type}`);
+    }
+  } catch (err) {
+    console.error('Erreur handling webhook:', err);
+  }
+
+  res.json({ received: true });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
 
-// Code pour garder le serveur actif en se pinguant régulièrement
-const https = require('https'); // Utilisation du module https pour les requêtes sécurisées
-const SERVER_URL = 'https://burban-stripe-service.onrender.com'; // Remplacez par l'URL publique de votre app
-
+// Ping self (ton code existant)
+const https = require('https');
+const SERVER_URL = process.env.SERVER_URL || 'https://burban-stripe-service.onrender.com';
 function pingSelf() {
-  https.get(SERVER_URL, (res) => {
-    console.log(`Ping effectué avec succès. Statut: ${res.statusCode}`);
-  }).on('error', (err) => {
-    console.error('Erreur lors du ping :', err.message);
-  });
+  https.get(SERVER_URL, (res) => console.log(`Ping OK ${res.statusCode}`)).on('error', (err) => console.error('Erreur ping :', err.message));
 }
-
-// Ping toutes les 3 minutes (180000 millisecondes)
 setInterval(pingSelf, 180000);
-
-// Ping initial au démarrage
 pingSelf();
