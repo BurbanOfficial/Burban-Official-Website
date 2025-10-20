@@ -1,6 +1,5 @@
 // server.js (remplace ton fichier actuel par celui-ci)
 // Dépendances
-require('dotenv').config(); // facultatif si Render gère les env vars
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -15,6 +14,14 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 app.use(cors());
 app.use(express.json()); // pour toutes les routes JSON normales
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Route de test pour GeoIP (facultative)
+app.get('/geoip', (req, res) => {
+  const xForwardedFor = req.headers['x-forwarded-for'];
+  const ip = xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.connection.remoteAddress;
+  const geo = geoip.lookup(ip);
+  res.json({ ip, geo });
+});
 
 // --- (TON CODE D'ORIGINE : shippingRates, getCategory, getShippingCost, getCombinedShippingCost, countryToRegion, euCountries) ---
 // (je conserve exactement tes fonctions / tables pour la cohérence)
@@ -211,15 +218,19 @@ app.post('/create-checkout-session', async (req, res) => {
       return res.status(400).json({ error: "Aucun article dans le panier." });
     }
 
-    // Détection région via GeoIP
+     // Détermination de la région de l'utilisateur via GeoIP
     const xForwardedFor = req.headers['x-forwarded-for'];
     const ip = xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.connection.remoteAddress;
     const geo = geoip.lookup(ip);
-    let region = 'worldwide';
+    let region = 'worldwide'; // Par défaut
     if (geo && geo.country) {
       const countryCode = geo.country.toLowerCase();
-      if (countryToRegion[countryCode]) region = countryToRegion[countryCode];
-      else if (euCountries.includes(countryCode)) region = 'europe';
+      console.log("Détection GeoIP :", countryCode);
+      if (countryToRegion[countryCode]) {
+        region = countryToRegion[countryCode];
+      } else if (euCountries.includes(countryCode)) {
+        region = 'europe';
+      }
     }
 
     // line_items produits
