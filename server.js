@@ -329,11 +329,9 @@ app.post('/create-checkout-session', async (req, res) => {
       // === AJOUT 3D SECURE 2 (UNIQUEMENT) ===
       // On demande explicitement à Stripe de solliciter 3D Secure (y compris 3DS2) lorsque disponible.
       // Ceci ne change pas les autres moyens de paiement : Stripe appliquera la 3DS uniquement aux paiements cartes quand nécessaire.
-      payment_intent_data: {
-        payment_method_options: {
-          card: {
-            request_three_d_secure: 'any'
-          }
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'any'
         }
       }
       // === FIN AJOUT 3D SECURE 2 ===
