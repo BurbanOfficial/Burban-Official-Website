@@ -216,6 +216,7 @@ const euCountries = [
   'ie','it','lv','lt','lu','mt','nl','pl','pt','ro','sk','si','es','se'
 ];
 
+/* --- REMPLACE ICI : coller tout le bloc ci-dessous à la place de ton app.post('/create-checkout-session'...) existant --- */
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { items, voucher } = req.body;
@@ -223,14 +224,13 @@ app.post('/create-checkout-session', async (req, res) => {
       return res.status(400).json({ error: "Aucun article dans le panier." });
     }
     
-    // Détermination de la région de l'utilisateur via GeoIP
+    // GeoIP pour la région (comme avant)
     const xForwardedFor = req.headers['x-forwarded-for'];
     const ip = xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.connection.remoteAddress;
     const geo = geoip.lookup(ip);
-    let region = 'worldwide'; // Par défaut
+    let region = 'worldwide';
     if (geo && geo.country) {
       const countryCode = geo.country.toLowerCase();
-      console.log("Détection GeoIP :", countryCode);
       if (countryToRegion[countryCode]) {
         region = countryToRegion[countryCode];
       } else if (euCountries.includes(countryCode)) {
@@ -302,16 +302,24 @@ app.post('/create-checkout-session', async (req, res) => {
       }
     }
 
-    // Création de la session Checkout (sans default_tax_rates, les taxes sont appliquées par line_item)
+    // === ICI : création de la session Checkout avec demande explicite 3D Secure ===
+    // On ajoute payment_method_options.card.request_three_d_secure = 'any'
+    // 'any' demande 3DS mais laisse une préférence pour une expérience frictionless si possible.
     const session = await stripe.checkout.sessions.create({
       payment_method_types: [
-    'card',            // Cartes & Cartes bancaires (Apple Pay & Google Pay inclus si activés)
-    'link',            // Link
-    'revolut_pay',     // Revolut
-    'amazon_pay',      // Amazon
-    'billie',          // Billie
-    'klarna'           // Klarna
-  ],
+        'card',
+        'link',
+        'revolut_pay',
+        'amazon_pay',
+        'billie',
+        'klarna'
+      ],
+      // **AJOUT 3DS** : demande à Stripe de tenter l'authentification 3D Secure pour les cartes.
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'any' // ou 'challenge' si tu veux forcer le challenge (moins recommandé)
+        }
+      },
       billing_address_collection: 'required',
       shipping_address_collection: {
         allowed_countries: [ 
@@ -319,8 +327,6 @@ app.post('/create-checkout-session', async (req, res) => {
         ],
       },
       line_items: lineItems,
-      // Si un voucher a été envoyé, on ajoute les discounts,
-      // sinon, on autorise l'utilisation de promotion_codes directement dans Stripe.
       ...(discounts.length > 0 ? { discounts } : { allow_promotion_codes: true }),
       mode: 'payment',
       success_url: 'https://burbanofficial.com/public/success.html',
