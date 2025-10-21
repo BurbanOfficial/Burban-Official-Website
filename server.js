@@ -324,7 +324,19 @@ app.post('/create-checkout-session', async (req, res) => {
       ...(discounts.length > 0 ? { discounts } : { allow_promotion_codes: true }),
       mode: 'payment',
       success_url: 'https://burbanofficial.com/public/success.html',
-      cancel_url: 'https://burbanofficial.com/public/cancel.html'
+      cancel_url: 'https://burbanofficial.com/public/cancel.html',
+
+      // === AJOUT 3D SECURE 2 (UNIQUEMENT) ===
+      // On demande explicitement à Stripe de solliciter 3D Secure (y compris 3DS2) lorsque disponible.
+      // Ceci ne change pas les autres moyens de paiement : Stripe appliquera la 3DS uniquement aux paiements cartes quand nécessaire.
+      payment_intent_data: {
+        payment_method_options: {
+          card: {
+            request_three_d_secure: 'any'
+          }
+        }
+      }
+      // === FIN AJOUT 3D SECURE 2 ===
     });
     
     res.json({ sessionId: session.id, url: session.url });
