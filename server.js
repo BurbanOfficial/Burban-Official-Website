@@ -89,14 +89,14 @@ const shippingRates = {
     worldwide: { unique: 10.59, additional: 5.30 }
   },
   category7: { // Casquettes, casquettes de baseball, casquettes snapback, casquettes en maille, bonnets, bobs, visières, bonnets all over
-    us:        { unique: 5.19, additional: 5.90 },
+    us:        { unique: 5.19, additional: 5.10 },
     europe:    { unique: 5.19, additional: 5.10 },
-    uk:        { unique: 5.19, additional: 5.90 },
+    uk:        { unique: 5.19, additional: 5.10 },
     efta:      { unique: 5.19, additional: 5.10 },
-    canada:    { unique: 5.19, additional: 5.90 },
-    australia: { unique: 5.19, additional: 5.90 },
-    japan:     { unique: 5.19, additional: 5.90 },
-    worldwide: { unique: 7, additional: 5.10 }
+    canada:    { unique: 5.19, additional: 5.10 },
+    australia: { unique: 5.19, additional: 5.10 },
+    japan:     { unique: 5.19, additional: 5.10 },
+    worldwide: { unique: 7, additional: 5.90 }
   }
 };
 
@@ -129,7 +129,7 @@ function getCategory(item) {
   if (name.includes("casquette") || name.includes("cap") || name.includes("bonnet") || name.includes("beanie") || name.includes("bob") || name.includes("visière")) {
     return "category6";
   }
-  if (name.includes("Knitted T-Shirt") || name.includes("knitted-t-shirt")) {
+  if (name.includes("ECHO//01") || name.includes("Knitted T-Shirt") || name.includes("knitted-t-shirt")) {
     return "category7";
   }
   return "category3"; // Par défaut
