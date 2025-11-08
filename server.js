@@ -87,6 +87,16 @@ const shippingRates = {
     japan:     { unique: 3.99, additional: 1.25 },
     brazil:    { unique: 4.09, additional: 2.25 },
     worldwide: { unique: 10.59, additional: 5.30 }
+  },
+  category7: { // Casquettes, casquettes de baseball, casquettes snapback, casquettes en maille, bonnets, bobs, visières, bonnets all over
+    us:        { unique: 5.19, additional: 5.90 },
+    europe:    { unique: 5.19, additional: 5.10 },
+    uk:        { unique: 5.19, additional: 5.90 },
+    efta:      { unique: 5.19, additional: 5.10 },
+    canada:    { unique: 5.19, additional: 5.90 },
+    australia: { unique: 5.19, additional: 5.90 },
+    japan:     { unique: 5.19, additional: 5.90 },
+    worldwide: { unique: 7, additional: 5.10 }
   }
 };
 
@@ -118,6 +128,9 @@ function getCategory(item) {
   }
   if (name.includes("casquette") || name.includes("cap") || name.includes("bonnet") || name.includes("beanie") || name.includes("bob") || name.includes("visière")) {
     return "category6";
+  }
+  if (name.includes("Knitted T-Shirt") || name.includes("knitted-t-shirt")) {
+    return "category7";
   }
   return "category3"; // Par défaut
 }
@@ -260,9 +273,9 @@ app.post('/create-checkout-session', async (req, res) => {
     let shippingTotal = getCombinedShippingCost(items, region);
 
     // Livraison gratuite dès 50 € d'achat
-    if (itemsTotal >= 50) {
-      shippingTotal = 0;
-    }
+    // if (itemsTotal >= 50) {
+      // shippingTotal = 0;
+    // }
 
     // Création du line_item pour les frais de livraison (si applicable) avec application de la taxe
     let lineItems = productLineItems;
