@@ -129,7 +129,7 @@ function getCategory(item) {
   if (name.includes("casquette") || name.includes("cap") || name.includes("bonnet") || name.includes("beanie") || name.includes("bob") || name.includes("visière")) {
     return "category6";
   }
-  if (name.includes("ECHO//01") || name.includes("Knitted T-Shirt") || name.includes("knitted-t-shirt")) {
+  if (name.includes("knitted") || name.includes("Knitted")) {
     return "category7";
   }
   return "category3"; // Par défaut
